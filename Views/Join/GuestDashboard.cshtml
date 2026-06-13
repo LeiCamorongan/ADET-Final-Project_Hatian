@@ -1,0 +1,252 @@
+﻿@model Hatian.Models.ViewModels.GuestDashboardViewModel
+
+@{
+    ViewData["Title"] = "Dashboard";
+    string[] avatarColors = { "#FFB5C6", "#FFE68C", "#B8EDD8", "#C9B8F5" };
+    var participants = Model.Event.Participants.ToList();
+    var myIdx = participants.FindIndex(p => p.Id == Model.CurrentGuest.Id);
+    var myColor = myIdx >= 0 ? avatarColors[myIdx % avatarColors.Length] : "#C9B8F5";
+    var avatarSeed = Uri.EscapeDataString(Model.CurrentGuest.Name);
+    var bgHex = myColor.Replace("#", "");
+}
+
+<div style="background-color: var(--bg-light); min-height: 100vh; padding: 2rem 1.25rem;">
+    <div style="max-width: 1100px; margin: 0 auto;">
+
+        <div style="display: grid; grid-template-columns: 260px 1fr; gap: 2rem; align-items: start;">
+
+            <!-- Profile Card -->
+            <div style="background: @myColor; border: 2px solid #2D2D2D; border-radius: 16px; padding: 1.5rem 1.25rem; box-shadow: 4px 4px 0px #2D2D2D; text-align: center; position: sticky; top: 1.25rem;">
+                <div style="width: 110px; height: 110px; border: 2px solid #2D2D2D; border-radius: 16px; overflow: hidden; box-shadow: 3px 3px 0px #2D2D2D; margin: 0 auto 1rem;">
+                    <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=@avatarSeed&backgroundColor=@bgHex"
+                         style="width:100%; height:100%; object-fit:cover;" />
+                </div>
+                <div style="font-size: 1rem; font-weight: 900; color: #2D2D2D; margin-bottom: 0.25rem;">Welcome Back!</div>
+                <div style="font-size: 0.78rem; font-weight: 700; color: #2D2D2D; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.5px;">@Model.CurrentGuest.Name</div>
+            </div>
+
+            <!-- Right Column -->
+            <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+
+                <!-- Header Card -->
+                <div style="background: #FFB5C6; border: 2px solid #2D2D2D; border-radius: 16px; padding: 1.5rem; box-shadow: 4px 4px 0px #2D2D2D;">
+                    <div style="font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #2D2D2D; margin-bottom: 0.25rem;">
+                        Joined as @Model.CurrentGuest.Name
+                    </div>
+                    <div style="font-size: 1.8rem; font-weight: 900; color: #2D2D2D; margin-bottom: 0.75rem;">
+                        @Model.Event.Title
+                    </div>
+                    <div style="font-size: 0.85rem; color: #444; display: flex; gap: 1.25rem; flex-wrap: wrap;">
+                        <span>📅 @Model.Event.Date.ToString("MMMM dd, yyyy")</span>
+                        <span>👥 @participants.Count people</span>
+                    </div>
+                </div>
+
+                <!-- Tabs -->
+                <div style="display: flex; gap: 8px;">
+                    <button class="guest-tab-btn active" data-tab="info"
+                            style="flex:1; background:#2D2D2D; color:white; border:2px solid #2D2D2D; border-radius:999px; padding:8px 0; font-weight:800; font-size:0.85rem; cursor:pointer;">
+                        Info
+                    </button>
+                    <button class="guest-tab-btn" data-tab="myshare"
+                            style="flex:1; background:white; color:#2D2D2D; border:2px solid #2D2D2D; border-radius:999px; padding:8px 0; font-weight:800; font-size:0.85rem; cursor:pointer;">
+                        My Share
+                    </button>
+                    <button class="guest-tab-btn" data-tab="expenses"
+                            style="flex:1; background:white; color:#2D2D2D; border:2px solid #2D2D2D; border-radius:999px; padding:8px 0; font-weight:800; font-size:0.85rem; cursor:pointer;">
+                        Expenses
+                    </button>
+                </div>
+
+                <!-- INFO TAB -->
+                <div class="guest-tab-panel" data-tab="info">
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Event.Description))
+                    {
+                        <div style="background: white; border: 2px solid #2D2D2D; border-radius: 16px; padding: 1.25rem; margin-bottom: 1rem; box-shadow: 4px 4px 0px #2D2D2D;">
+                            <div style="font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #888; margin-bottom: 0.5rem;">About This Event</div>
+                            <div style="font-size: 0.95rem; color: #2D2D2D;">@Model.Event.Description</div>
+                        </div>
+                    }
+
+                    <!-- Who's Bringing What -->
+                    <div style="background: white; border: 2px solid #2D2D2D; border-radius: 16px; padding: 1.25rem; box-shadow: 4px 4px 0px #2D2D2D;">
+                        <div style="font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #888; margin-bottom: 0.75rem;">Who's Bringing What</div>
+                        <div style="display: flex; flex-direction: column; gap: 12px;">
+                            @for (int i = 0; i < participants.Count; i++)
+                            {
+                                var p = participants[i];
+                                var color = avatarColors[i % avatarColors.Length];
+                                var initial = p.Name.Length > 0 ? p.Name.Substring(0, 1).ToUpper() : "?";
+                                <div style="display:flex; align-items:center; gap:12px;">
+                                    <div style="width:40px; height:40px; flex-shrink:0; border-radius:50%; background:@color; border:2px solid #2D2D2D; display:flex; align-items:center; justify-content:center; font-weight:800; color:#2D2D2D; font-size:0.85rem;">
+                                        @initial
+                                    </div>
+                                    <div>
+                                        <div style="font-weight:800; color:#2D2D2D; font-size:0.95rem;">
+                                            @p.Name
+                                            @if (p.IsOrganizer) { <span style="font-weight:500; color:#888;">· organizer</span> }
+                                            @if (p.Id == Model.CurrentGuest.Id) { <span style="font-weight:500; color:#888;"> (you)</span> }
+                                        </div>
+                                        <div style="font-size:0.8rem; color:#888;">
+                                            @(string.IsNullOrWhiteSpace(p.Contribution) ? "Nothing listed" : p.Contribution)
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MY SHARE TAB -->
+                <div class="guest-tab-panel" data-tab="myshare" style="display:none;">
+
+                    <!-- Total Owed -->
+                    <div style="background: white; border: 2px solid #2D2D2D; border-radius: 16px; padding: 1.25rem; margin-bottom: 1rem; box-shadow: 4px 4px 0px #2D2D2D;">
+                        @{
+                            var myInitial = Model.CurrentGuest.Name.Length > 0 ? Model.CurrentGuest.Name.Substring(0, 1).ToUpper() : "?";
+                        }
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <div style="width:44px; height:44px; flex-shrink:0; border-radius:50%; background:@myColor; border:2px solid #2D2D2D; display:flex; align-items:center; justify-content:center; font-weight:800; color:#2D2D2D; font-size:0.9rem;">
+                                @myInitial
+                            </div>
+                            <div>
+                                <div style="font-weight:800; color:#2D2D2D; font-size:1rem;">@Model.CurrentGuest.Name</div>
+                                <div style="font-weight:900; color:#FF6B6B; font-size:1rem;">
+                                    @if (Model.TotalOwed > 0)
+                                    {
+                                        <span>You owe ₱@Model.TotalOwed.ToString("0.00")</span>
+                                    }
+                                    else
+                                    {
+                                        <span style="color:#2D2D2D;">You're all settled up ✓</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- My Share Breakdown -->
+                    @if (Model.ShareItems.Any())
+                    {
+                        <div style="background: white; border: 2px solid #2D2D2D; border-radius: 16px; padding: 1.25rem; margin-bottom: 1rem; box-shadow: 4px 4px 0px #2D2D2D;">
+                            <div style="font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #888; margin-bottom: 0.75rem;">My Share Breakdown</div>
+                            <div style="display:flex; flex-direction:column; gap:10px;">
+                                @foreach (var item in Model.ShareItems)
+                                {
+                                    var payerIdx = participants.FindIndex(p => p.Name == item.PayerName);
+                                    var payerColor = payerIdx >= 0 ? avatarColors[payerIdx % avatarColors.Length] : "#EEE";
+                                    var payerInitial = item.PayerName.Length > 0 ? item.PayerName.Substring(0, 1).ToUpper() : "?";
+                                    <div style="display:flex; align-items:center; gap:12px;">
+                                        <div style="width:36px; height:36px; flex-shrink:0; border-radius:50%; background:@payerColor; border:2px solid #2D2D2D; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:0.75rem; color:#2D2D2D;">
+                                            @payerInitial
+                                        </div>
+                                        <div style="flex:1; font-weight:700; color:#2D2D2D; font-size:0.9rem;">@item.ExpenseDescription</div>
+                                        <div style="font-weight:900; color:#2D2D2D; font-size:0.9rem;">−₱@item.YourProportionalShare.ToString("0.00")</div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Note -->
+                        <div style="background: #FFE68C; border: 2px solid #2D2D2D; border-radius: 12px; padding: 0.9rem 1.1rem; box-shadow: 3px 3px 0px #2D2D2D; font-size: 0.85rem; color: #2D2D2D; font-weight: 600;">
+                            💬 Once you've paid, let the organizer know and they'll mark you as paid.
+                        </div>
+                    }
+                    else
+                    {
+                        <div style="background:white; border:2px solid #2D2D2D; border-radius:16px; padding:2rem; text-align:center; box-shadow:4px 4px 0px #2D2D2D;">
+                            <div style="font-size:1.5rem; margin-bottom:0.5rem;">🎉</div>
+                            <div style="font-weight:800; color:#2D2D2D;">Nothing owed yet!</div>
+                            <div style="font-size:0.85rem; color:#888;">No expenses have been added.</div>
+                        </div>
+                    }
+                </div>
+
+                <!-- EXPENSES TAB -->
+                <div class="guest-tab-panel" data-tab="expenses" style="display:none;">
+                    @if (!Model.Event.Expenses.Any())
+                    {
+                        <div style="background:white; border:2px solid #2D2D2D; border-radius:16px; padding:2.5rem 1.5rem; text-align:center; box-shadow:4px 4px 0px #2D2D2D;">
+                            <div style="font-size:2rem; margin-bottom:0.5rem;">🧾</div>
+                            <div style="font-weight:800; color:#2D2D2D; font-size:0.95rem;">No expenses yet</div>
+                            <div style="font-size:0.8rem; color:#888;">The organizer hasn't added any.</div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div style="display:flex; flex-direction:column; gap:0.75rem;">
+                            @foreach (var exp in Model.Event.Expenses)
+                            {
+                                var splitCount = exp.Splits?.Count ?? 1;
+                                var myShare = exp.Splits != null && exp.Splits.Any(s => s.ParticipantId == Model.CurrentGuest.Id)
+                                    ? exp.Amount / splitCount : 0;
+                                var payerIdx = participants.FindIndex(p => p.Id == exp.PaidByParticipantId);
+                                var payerColor = payerIdx >= 0 ? avatarColors[payerIdx % avatarColors.Length] : "#EEE";
+                                var payerInitial = exp.PaidBy?.Name.Length > 0 ? exp.PaidBy.Name.Substring(0, 1).ToUpper() : "?";
+
+                                <div style="background:white; border:2px solid #2D2D2D; border-radius:16px; padding:1rem 1.25rem; box-shadow:4px 4px 0px #2D2D2D;">
+                                    <div style="display:flex; align-items:flex-start; gap:12px;">
+                                        <div style="width:40px; height:40px; flex-shrink:0; border-radius:50%; background:@payerColor; border:2px solid #2D2D2D; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:0.8rem; color:#2D2D2D;">
+                                            @payerInitial
+                                        </div>
+                                        <div style="flex:1;">
+                                            <div style="font-weight:800; color:#2D2D2D; font-size:0.95rem;">@exp.Description</div>
+                                            <div style="font-size:0.8rem; color:#888;">Paid by @exp.PaidBy?.Name · @splitCount people</div>
+                                            @if (exp.Splits != null && exp.Splits.Any())
+                                            {
+                                                <div style="display:flex; gap:4px; flex-wrap:wrap; margin-top:6px;">
+                                                    @foreach (var split in exp.Splits)
+                                                    {
+                                                        var sIdx = participants.FindIndex(p => p.Id == split.ParticipantId);
+                                                        var sc = sIdx >= 0 ? avatarColors[sIdx % avatarColors.Length] : "#EEE";
+                                                        var si = sIdx >= 0 && participants[sIdx].Name.Length > 0 ? participants[sIdx].Name.Substring(0, 1).ToUpper() : "?";
+                                                        var isMe = sIdx >= 0 && participants[sIdx].Id == Model.CurrentGuest.Id;
+                                                        <div style="width:26px; height:26px; border-radius:50%; background:@sc; border:2px solid #2D2D2D; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:0.65rem; color:#2D2D2D; @(isMe ? "box-shadow:0 0 0 2px #FF6B6B;" : "")">
+                                                            @si
+                                                        </div>
+                                                    }
+                                                </div>
+                                            }
+                                        </div>
+                                        <div style="text-align:right; flex-shrink:0;">
+                                            <div style="font-weight:900; color:#2D2D2D; font-size:1rem;">₱@exp.Amount.ToString("0.00")</div>
+                                            @if (myShare > 0)
+                                            {
+                                                <div style="font-size:0.75rem; color:#FF6B6B; font-weight:700;">your share: ₱@myShare.ToString("0.00")</div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    @@media (max-width: 640px) {
+        div[style*="grid-template-columns: 260px"] {
+            grid-template-columns: 1fr !important;
+        }
+    }
+</style>
+
+<script>
+    document.querySelectorAll('.guest-tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const target = btn.dataset.tab;
+            document.querySelectorAll('.guest-tab-btn').forEach(b => {
+                b.style.background = b.dataset.tab === target ? '#2D2D2D' : 'white';
+                b.style.color = b.dataset.tab === target ? 'white' : '#2D2D2D';
+            });
+            document.querySelectorAll('.guest-tab-panel').forEach(p => {
+                p.style.display = p.dataset.tab === target ? 'block' : 'none';
+            });
+        });
+    });
+</script>

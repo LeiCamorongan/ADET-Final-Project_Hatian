@@ -1,0 +1,198 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Hatian</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/layout.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/components.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/pages.css" asp-append-version="true" />
+</head>
+<body>
+
+    <header>
+        <nav class="navbar navbar-expand-sm" style="background-color: white !important; border-bottom: 2px solid #2D2D2D;">
+            <div class="container">
+
+                <a class="navbar-brand" asp-controller="Home" asp-action="Index">
+                    <img src="~/images/HatianLogo.png" alt="Hatian" style="height:50px;" />
+                </a>
+
+                <button class="navbar-toggler" type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target=".navbar-collapse">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-end">
+                    <ul class="navbar-nav flex-grow-1 justify-content-end align-items-center gap-3">
+
+                        <li class="nav-item">
+                            <a class="nav-link text-dark fw-medium"
+                               href="#"
+                               data-bs-toggle="modal"
+                               data-bs-target="#aboutModal">
+                                About Us
+                            </a>
+                        </li>
+
+                        @if (User.Identity != null && User.Identity.IsAuthenticated)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark fw-medium"
+                                   asp-controller="Dashboard"
+                                   asp-action="Index">
+                                    My Dashboard
+                                </a>
+                            </li>
+
+                            <li class="nav-item">
+                                <form asp-area="Identity"
+                                      asp-page="/Account/Logout"
+                                      asp-route-returnUrl="/"
+                                      method="post">
+                                    <button type="submit"
+                                            style="background: white; border: 2px solid #2D2D2D; border-radius: 999px; padding: 8px 24px; font-weight: 800; font-size: 0.9rem; cursor: pointer; box-shadow: 3px 3px 0px #2D2D2D;">
+                                        Logout ⇥
+                                    </button>
+                                </form>
+                            </li>
+                        }
+                        else
+                        {
+                            @if (ViewData["IsGuest"] != null)
+                            {
+                                <li class="nav-item">
+                                    <a style="background: white; border: 2px solid #2D2D2D; border-radius: 999px; padding: 8px 24px; display: inline-block; text-align: center; font-weight: 800; font-size: 0.9rem; box-shadow: 3px 3px 0px #2D2D2D; text-decoration: none; color: #2D2D2D;"
+                                       asp-controller="Home" asp-action="Index">
+                                        ← Home
+                                    </a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li class="nav-item">
+                                    <a style="background: white; border: 2px solid #2D2D2D; border-radius: 999px; padding: 8px 0; width: 120px; display: inline-block; text-align: center; font-weight: 800; font-size: 0.9rem; box-shadow: 3px 3px 0px #2D2D2D; text-decoration: none; color: #2D2D2D;"
+                                       asp-area="Identity"
+                                       asp-page="/Account/Login">
+                                        Login
+                                    </a>
+                                </li>
+
+                                <li class="nav-item">
+                                    <a style="background: white; border: 2px solid #2D2D2D; border-radius: 999px; padding: 8px 0; width: 120px; display: inline-block; text-align: center; font-weight: 800; font-size: 0.9rem; box-shadow: 3px 3px 0px #2D2D2D; text-decoration: none; color: #2D2D2D;"
+                                       asp-area="Identity"
+                                       asp-page="/Account/Register">
+                                        Register
+                                    </a>
+                                </li>
+                            }
+                        }
+
+                    </ul>
+                </div>
+
+            </div>
+        </nav>
+    </header>
+
+    <div>
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+
+    <!-- About Us Modal -->
+    <div class="modal fade" id="aboutModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content" style="border: 2px solid #2D2D2D; border-radius: 24px; box-shadow: 6px 6px 0px #2D2D2D; overflow: hidden;">
+
+                <!-- Header -->
+                <div style="background: #FFB5C6; border-bottom: 2px solid #2D2D2D; padding: 1.5rem 2rem; display: flex; justify-content: space-between; align-items: center;">
+                    <div style="font-size: 1.4rem; font-weight: 900; color: #2D2D2D;">About Hatian 🥥</div>
+                    <button type="button" data-bs-dismiss="modal"
+                            style="background: white; border: 2px solid #2D2D2D; border-radius: 999px; width: 36px; height: 36px; font-weight: 900; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                        ✕
+                    </button>
+                </div>
+
+                <!-- Body -->
+                <div style="background: #FFFDF9; padding: 2rem;">
+
+                    <p style="font-size: 0.95rem; color: #2D2D2D; text-align: center; margin-bottom: 0.5rem;">
+                        <strong>Hatian</strong> (Filipino: <em>hati-hati</em>) means to split equally among friends.
+                        We built this because settling bills after a great hangout shouldn't end
+                        in awkward group chats or forgotten IOUs.
+                    </p>
+                    <p style="font-size: 0.9rem; color: #555; text-align: center; margin-bottom: 2rem;">
+                        Our goal is simple: one organizer creates an event, lists what everyone owes,
+                        and tracks who has paid — so the whole barkada can enjoy the night without the stress of money drama.
+                    </p>
+
+                    <div class="d-flex justify-content-center gap-2 mb-3">
+                        <span style="background: white; border: 2px solid #2D2D2D; border-radius: 999px; padding: 6px 16px; font-size: 0.8rem; font-weight: 700;">Built for Filipinos 🇵🇭</span>
+                        <span style="background: white; border: 2px solid #2D2D2D; border-radius: 999px; padding: 6px 16px; font-size: 0.8rem; font-weight: 700;">Free to use 🎉</span>
+                    </div>
+
+                    <hr style="border: 1px solid #E0E0E0; margin: 1.5rem 0;" />
+
+                    <div style="font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #888; text-align: center; margin-bottom: 1.25rem;">
+                        Meet the Team
+                    </div>
+
+                    <div class="d-flex justify-content-center gap-4 flex-wrap">
+
+                        <div style="text-align: center;">
+                            <div style="width: 80px; height: 80px; border: 2px solid #2D2D2D; border-radius: 16px; overflow: hidden; box-shadow: 3px 3px 0px #2D2D2D; margin: 0 auto 0.5rem;">
+                                <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=dev1&backgroundColor=c9b8f5"
+                                     style="width: 100%; height: 100%; object-fit: cover;" />
+                            </div>
+                            <div style="font-weight: 800; font-size: 0.85rem; color: #2D2D2D;">Dev Name</div>
+                            <div style="font-size: 0.72rem; color: #888;">Frontend</div>
+                        </div>
+
+                        <div style="text-align: center;">
+                            <div style="width: 80px; height: 80px; border: 2px solid #2D2D2D; border-radius: 16px; overflow: hidden; box-shadow: 3px 3px 0px #2D2D2D; margin: 0 auto 0.5rem;">
+                                <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=dev2&backgroundColor=ffb5c6"
+                                     style="width: 100%; height: 100%; object-fit: cover;" />
+                            </div>
+                            <div style="font-weight: 800; font-size: 0.85rem; color: #2D2D2D;">Dev Name</div>
+                            <div style="font-size: 0.72rem; color: #888;">Backend</div>
+                        </div>
+
+                        <div style="text-align: center;">
+                            <div style="width: 80px; height: 80px; border: 2px solid #2D2D2D; border-radius: 16px; overflow: hidden; box-shadow: 3px 3px 0px #2D2D2D; margin: 0 auto 0.5rem;">
+                                <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=dev3&backgroundColor=ffe68c"
+                                     style="width: 100%; height: 100%; object-fit: cover;" />
+                            </div>
+                            <div style="font-weight: 800; font-size: 0.85rem; color: #2D2D2D;">Dev Name</div>
+                            <div style="font-size: 0.72rem; color: #888;">Database</div>
+                        </div>
+
+                        <div style="text-align: center;">
+                            <div style="width: 80px; height: 80px; border: 2px solid #2D2D2D; border-radius: 16px; overflow: hidden; box-shadow: 3px 3px 0px #2D2D2D; margin: 0 auto 0.5rem;">
+                                <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=dev4&backgroundColor=b8edd8"
+                                     style="width: 100%; height: 100%; object-fit: cover;" />
+                            </div>
+                            <div style="font-weight: 800; font-size: 0.85rem; color: #2D2D2D;">Dev Name</div>
+                            <div style="font-size: 0.72rem; color: #888;">Full Stack</div>
+                        </div>
+
+                    </div>
+
+                    <p style="text-align: center; font-size: 0.75rem; color: #aaa; margin-top: 1.5rem; margin-bottom: 0;">
+                        hatian · split bills, not friendships 🥥
+                    </p>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

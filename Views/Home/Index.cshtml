@@ -1,0 +1,173 @@
+﻿@{
+    ViewData["Title"] = "Home";
+}
+
+<!-- HERO -->
+<section class="hero-section">
+    <div class="hero-overlay">
+        <div class="hero-receipt text-center">
+
+            <img src="~/images/HatianLogo.png"
+                 alt="Hatian"
+                 class="img-fluid mb-3"
+                 style="max-width:180px;" />
+
+            <h2 class="fw-bold">
+                Split expenses. More fun, no stress.
+            </h2>
+
+            <p class="text-muted">
+                Hatian makes it easy for friends to split bills,
+                track payments, and enjoy every moment together.
+            </p>
+
+            <div class="d-grid gap-2 mt-4">
+
+                @if (User.Identity != null && User.Identity.IsAuthenticated)
+                {
+                    <a asp-controller="Dashboard"
+                       asp-action="Index"
+                       class="btn-step">
+                        My Dashboard
+                    </a>
+                }
+                else
+                {
+                    <a asp-area="Identity"
+                       asp-page="/Account/Login"
+                       class="btn-step">
+                        Create Event
+                    </a>
+                }
+
+                <a asp-controller="Join"
+   asp-action="Index"
+   style="background: white; border: 2px solid #2D2D2D; border-radius: 999px; padding: 12px 0; width: 100%; display: block; text-align: center; font-weight: 800; font-size: 0.95rem; box-shadow: 3px 3px 0px #2D2D2D; text-decoration: none; color: #2D2D2D;">
+    Join Event
+</a>
+
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="container py-5">
+
+    <small class="text-uppercase text-danger fw-bold">
+        How It Works
+    </small>
+
+    <h1 class="fw-bold mb-5">
+        Three steps. Zero stress.
+    </h1>
+
+    <div class="row g-4">
+
+        <div class="col-lg-4">
+            <div class="step-card card-purple">
+
+                <span class="step-label">STEP 01</span>
+
+                <h3 class="fw-bold">Create an Event</h3>
+
+                <p>
+                    Start your outing, trip, birthday,
+                    or barkada gathering in seconds.
+                </p>
+
+                @if (User.Identity != null && User.Identity.IsAuthenticated)
+                {
+                    <a asp-controller="Dashboard"
+                       asp-action="Index"
+                       class="btn-step text-center text-decoration-none">
+                        Create Event →
+                    </a>
+                }
+                else
+                {
+                    <a asp-area="Identity"
+                       asp-page="/Account/Login"
+                       class="btn-step text-center text-decoration-none">
+                        Create Event →
+                    </a>
+                }
+
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="step-card card-pink">
+
+                <span class="badge-fun">MOST FUN STEP</span>
+                <span class="step-label">STEP 02</span>
+
+                <h3 class="fw-bold">Add Friends</h3>
+
+                <p>
+                    Invite everyone and define who joins
+                    each expense.
+                </p>
+
+                <a asp-controller="Join"
+                   asp-action="Index"
+                   class="btn-step text-center text-decoration-none">
+                    Add Friends →
+                </a>
+
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+    <div class="step-card card-yellow">
+
+        <span class="step-label">STEP 03</span>
+
+        <h3 class="fw-bold">Settle Up</h3>
+
+        <p>
+            Instantly see who owes what
+            and settle fairly.
+        </p>
+
+        <a asp-controller="Join" asp-action="Index"
+           class="btn-step text-center text-decoration-none">
+            Get Started →
+        </a>
+
+    </div>
+</div>
+
+    </div>
+
+</section>
+
+<!-- STATS -->
+<section class="stats-banner">
+    <div class="container">
+        <div class="row text-center">
+
+            <div class="col-md-3">
+                <div class="stat-number">50K+</div>
+                <div class="stat-label">BILLS SPLIT</div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="stat-number">₱12M+</div>
+                <div class="stat-label">SETTLED SO FAR</div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="stat-number">0</div>
+                <div class="stat-label">FRIENDSHIPS LOST</div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="stat-number">4.9★</div>
+                <div class="stat-label">APP STORE RATING</div>
+            </div>
+
+        </div>
+    </div>
+</section>

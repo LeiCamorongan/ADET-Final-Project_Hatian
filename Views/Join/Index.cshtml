@@ -1,0 +1,41 @@
+﻿@model Hatian.Models.ViewModels.JoinEventViewModel
+
+@{
+    ViewData["Title"] = "Join Event";
+}
+
+<div class="container py-5">
+
+    <div style="max-width:500px; margin: 0 auto;">
+
+        <!-- Back to Home Button -->
+        <div class="mb-3">
+            <a asp-controller="Home" asp-action="Index"
+               style="display: inline-flex; align-items: center; gap: 6px; background: white; border: 2px solid #2D2D2D; border-radius: 999px; padding: 8px 20px; font-weight: 800; font-size: 0.9rem; box-shadow: 3px 3px 0px #2D2D2D; text-decoration: none; color: #2D2D2D;">
+                ← Back to Home
+            </a>
+        </div>
+
+        <div class="hatian-card">
+
+            <h2 class="fw-bold mb-4">
+                Join Event
+            </h2>
+
+            <form asp-action="Index" method="post">
+
+                <input asp-for="InviteToken"
+                       class="form-control hatian-input mb-3"
+                       placeholder="Enter Invite Code" />
+
+                <button class="btn btn-dark rounded-pill w-100">
+                    Continue
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>

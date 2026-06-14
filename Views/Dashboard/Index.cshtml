@@ -1,119 +1,85 @@
-﻿@model Hatian.Models.ViewModels.DashboardViewModel
+@model Hatian.Models.ViewModels.DashboardViewModel
 @{
     ViewData["Title"] = "Dashboard";
 }
 
-<!-- Delete Confirmation Modal -->
-<div id="deleteModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:9999; align-items:center; justify-content:center;">
-    <div style="background:white; border:2px solid #2D2D2D; border-radius:24px; box-shadow:6px 6px 0px #2D2D2D; padding:2rem; max-width:400px; width:90%; text-align:center;">
-        <div style="font-size:2rem; margin-bottom:0.5rem;">🗑️</div>
+<!-- Delete Event Modal -->
+<div id="deleteModal" class="modal-overlay">
+    <div class="modal-box">
         <div style="font-size:1.2rem; font-weight:900; color:#2D2D2D; margin-bottom:0.5rem;">Delete this event?</div>
         <div style="font-size:0.9rem; color:#555; margin-bottom:1.5rem;">This cannot be undone. All participants and expenses will be removed.</div>
-        <div style="display:flex; gap:12px; justify-content:center;">
-            <button onclick="closeDeleteModal()"
-                    style="background:white; border:2px solid #2D2D2D; border-radius:999px; padding:10px 28px; font-weight:800; font-size:0.9rem; cursor:pointer; box-shadow:3px 3px 0px #2D2D2D;">
-                Cancel
-            </button>
+        <div class="d-flex gap-3 justify-content-center">
+            <button onclick="closeDeleteModal()" class="btn-modal light">Cancel</button>
             <form id="deleteForm" method="post" asp-controller="Event" asp-action="Delete">
                 <input type="hidden" name="id" id="deleteEventId" />
-                <button type="submit"
-                        style="background:#2D2D2D; color:white; border:2px solid #2D2D2D; border-radius:999px; padding:10px 28px; font-weight:800; font-size:0.9rem; cursor:pointer; box-shadow:3px 3px 0px #2D2D2D;">
-                    Yes, Delete
-                </button>
+                <button type="submit" class="btn-modal dark">Yes, Delete</button>
             </form>
         </div>
     </div>
 </div>
 
-<!-- Delete Expense Confirmation Modal -->
-<div id="deleteExpenseModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:10000; align-items:center; justify-content:center;">
-    <div style="background:white; border:2px solid #2D2D2D; border-radius:24px; box-shadow:6px 6px 0px #2D2D2D; padding:2rem; max-width:400px; width:90%; text-align:center;">
-        <div style="font-size:2rem; margin-bottom:0.5rem;">🗑️</div>
-        <div style="font-size:1.2rem; font-weight:900; color:#2D2D2D; margin-bottom:0.5rem;">Delete this expense?</div>
-        <div style="font-size:0.9rem; color:#555; margin-bottom:1.5rem;">This cannot be undone.</div>
-        <div style="display:flex; gap:12px; justify-content:center;">
-            <button onclick="closeDeleteExpenseModal()"
-                    style="background:white; border:2px solid #2D2D2D; border-radius:999px; padding:10px 28px; font-weight:800; font-size:0.9rem; cursor:pointer; box-shadow:3px 3px 0px #2D2D2D;">
-                Cancel
-            </button>
-            <form id="deleteExpenseForm" method="post" asp-controller="Event" asp-action="DeleteExpense">
-                <input type="hidden" name="expenseId" id="deleteExpenseId" />
-                <input type="hidden" name="eventId" id="deleteExpenseEventId" />
-                <button type="submit"
-                        style="background:#2D2D2D; color:white; border:2px solid #2D2D2D; border-radius:999px; padding:10px 28px; font-weight:800; font-size:0.9rem; cursor:pointer; box-shadow:3px 3px 0px #2D2D2D;">
-                    Yes, Delete
-                </button>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Create Event Side Panel -->
-<div id="createOverlay" onclick="closeCreatePanel()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:9998;"></div>
-<div id="createPanel" style="position:fixed; top:0; right:-450px; width:420px; max-width:90vw; height:100vh; background:white; border-left:2px solid #2D2D2D; border-radius: 24px 0 0 24px; box-shadow:-6px 0px 0px #2D2D2D; z-index:9999; transition: right 0.3s ease; overflow-y:auto; padding:2rem;">
-    <button onclick="closeCreatePanel()" style="position:absolute; top:1.5rem; right:1.5rem; background:#FFB5C6; border:2px solid #2D2D2D; border-radius:50%; width:36px; height:36px; font-weight:900; cursor:pointer;">✕</button>
+<!-- Create Event Panel -->
+<div id="createOverlay" onclick="closeCreatePanel()" class="side-overlay"></div>
+<div id="createPanel" class="side-panel" style="right:-450px; width:420px; max-width:90vw;">
+    <button onclick="closeCreatePanel()" class="panel-close-btn">✕</button>
     @await Html.PartialAsync("~/Views/Event/_CreateEventPartial.cshtml", new Hatian.Models.ViewModels.CreateEventViewModel())
 </div>
 
-<!-- Event Details Side Panel -->
-<div id="detailsOverlay" onclick="closeDetailsPanel()" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:9998;"></div>
-<div id="detailsPanel" style="position:fixed; top:0; right:-520px; width:480px; max-width:90vw; height:100vh; background: var(--bg-light); border-left:2px solid #2D2D2D; border-radius: 24px 0 0 24px; box-shadow:-6px 0px 0px #2D2D2D; z-index:9999; transition: right 0.3s ease; overflow-y:auto; padding:2rem;">
-    <button onclick="closeDetailsPanel()" style="position:absolute; top:1.5rem; right:1.5rem; background:#FFB5C6; border:2px solid #2D2D2D; border-radius:50%; width:36px; height:36px; font-weight:900; cursor:pointer; z-index:1;">✕</button>
+<!-- Event Details Panel -->
+<div id="detailsOverlay" onclick="closeDetailsPanel()" class="side-overlay"></div>
+<div id="detailsPanel" class="side-panel" style="right:-520px; width:480px; max-width:90vw; background: var(--bg-light);">
+    <button onclick="closeDetailsPanel()" class="panel-close-btn">✕</button>
     <div id="detailsPanelContent"></div>
 </div>
 
-<div style="background-color: var(--bg-light); min-height: 100vh; padding: 3rem 2.5rem;">
-    <div style="max-width: 1100px; margin: 0 auto;">
+<div class="dashboard-wrapper">
+    <div class="dashboard-container">
         <div class="d-flex align-items-start" style="gap: 3rem;">
 
-            <!-- LEFT PANEL -->
-            <div style="width: 220px; flex-shrink: 0; text-align: center;">
-                <div style="border: 2px solid #2D2D2D; border-radius: 20px; overflow: hidden; box-shadow: 4px 4px 0px #2D2D2D; background: white;">
+            <!-- LEFT: profile card -->
+            <div class="profile-sidebar">
+                <div class="profile-avatar-wrapper">
                     <img src="https://api.dicebear.com/7.x/adventurer/svg?seed=@User.Identity!.Name&backgroundColor=ffffff"
                          alt="Avatar" style="width: 100%; height: auto; display: block;" />
                 </div>
                 <div style="padding: 1rem 0.25rem 0;">
-                    <div style="font-size: 1.3rem; font-weight: 900; color: #2D2D2D; margin-bottom: 0.3rem;">Welcome Back!</div>
-                    <div style="font-size: 0.7rem; font-weight: 700; color: #888; text-transform: uppercase; letter-spacing: 1px;">
-                        @User.Identity!.Name
-                    </div>
+                    <div class="profile-name">Welcome Back!</div>
+                    <div class="profile-email">@User.Identity!.Name</div>
                 </div>
             </div>
 
-            <!-- RIGHT PANEL -->
-            <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1.25rem;">
+            <!-- RIGHT: main content -->
+            <div class="dashboard-content">
 
-                <!-- Stats Row -->
+                <!-- Stats -->
                 <div class="d-flex gap-3">
-                    <div style="flex: 1; background: #FFB5C6; border: 2px solid #2D2D2D; border-radius: 16px; padding: 1.5rem 1.75rem; box-shadow: 4px 4px 0px #2D2D2D;">
-                        <div style="font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #2D2D2D;">Active Events</div>
-                        <div style="font-size: 2.75rem; font-weight: 900; color: #2D2D2D;">@Model.ActiveEvents.Count</div>
+                    <div class="stat-box" style="background: var(--pink);">
+                        <div class="stat-title">Active Events</div>
+                        <div class="stat-value">@Model.ActiveEvents.Count</div>
                     </div>
-                    <div style="flex: 1; background: #B8EDD8; border: 2px solid #2D2D2D; border-radius: 16px; padding: 1.5rem 1.75rem; box-shadow: 4px 4px 0px #2D2D2D;">
-                        <div style="font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #2D2D2D;">Completed</div>
-                        <div style="font-size: 2.75rem; font-weight: 900; color: #2D2D2D;">@Model.CompletedEvents.Count</div>
+                    <div class="stat-box" style="background: var(--green);">
+                        <div class="stat-title">Completed</div>
+                        <div class="stat-value">@Model.CompletedEvents.Count</div>
                     </div>
                 </div>
 
-                <!-- New Event Button -->
-                <div onclick="openCreatePanel()"
-                     class="d-flex align-items-center gap-3"
-                     style="background: #FFE68C; border: 2px solid #2D2D2D; border-radius: 16px; padding: 1.25rem 1.5rem; box-shadow: 4px 4px 0px #2D2D2D; cursor: pointer;">
-                    <div style="width: 42px; height: 42px; background: #FFB5C6; border: 2px solid #2D2D2D; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #2D2D2D; font-size: 1.4rem; font-weight: 900; flex-shrink: 0;">+</div>
+                <!-- New Event -->
+                <div onclick="openCreatePanel()" class="new-event-card d-flex align-items-center gap-3">
+                    <div class="icon-circle">+</div>
                     <div>
                         <div style="font-weight: 800; color: #2D2D2D; font-size: 1rem;">New Event</div>
                         <div style="font-size: 0.8rem; color: #555; font-weight: 500;">Create and invite friends</div>
                     </div>
                 </div>
 
-                <!-- Active Section -->
+                <!-- Active Events -->
                 <div>
                     <span class="step-label mb-2 d-inline-block">Active</span>
                     <div class="d-flex flex-column gap-2">
                         @if (!Model.ActiveEvents.Any())
                         {
-                            <div style="background: white; border: 2px solid #2D2D2D; border-radius: 16px; padding: 1.5rem; text-align: center; color: #2D2D2D; font-size: 0.9rem; font-weight: 600; box-shadow: 4px 4px 0px #2D2D2D;">
-                                No active events yet. Create one above! 🎉
+                            <div class="info-card" style="text-align: center; font-size: 0.9rem; font-weight: 600;">
+                                No active events yet. Create one above!
                             </div>
                         }
                         else
@@ -123,18 +89,18 @@
                                 var paidCount = ev.Participants.Count(p => p.IsPaid && !p.IsOrganizer);
                                 var totalGuests = ev.Participants.Count(p => !p.IsOrganizer);
 
-                                <div style="background: #FFB5C6; border: 2px solid #2D2D2D; border-radius: 16px; padding: 1.1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 4px 4px 0px #2D2D2D;">
+                                <div data-event-card="@ev.Id" class="event-card" style="background: var(--pink);">
                                     <a href="#" onclick="openDetailsPanel('@ev.Id'); return false;" class="text-decoration-none" style="flex: 1;">
-                                        <div style="font-weight: 800; font-size: 1rem; color: #2D2D2D;">@ev.Title</div>
-                                        <div style="font-size: 0.8rem; color: #555; margin-top: 3px;">
-                                            📅 @ev.Date.ToString("MMM dd, yyyy") &nbsp;👥 @ev.Participants.Count person@(ev.Participants.Count != 1 ? "s" : "")
+                                        <div class="event-title">@ev.Title</div>
+                                        <div class="event-meta">
+                                            📅 @ev.Date.ToString("MMM dd, yyyy") · 👥 @ev.Participants.Count person@(ev.Participants.Count != 1 ? "s" : "")
                                         </div>
                                     </a>
-                                    <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
-                                        <span style="background: #FFE68C; color: #2D2D2D; border: 2px solid #2D2D2D; border-radius: 20px; font-size: 0.72rem; font-weight: 800; padding: 5px 12px; white-space: nowrap;">
+                                    <div class="d-flex align-items-center gap-2" style="flex-shrink: 0;">
+                                        <span class="pill-badge paid-badge" style="background: var(--yellow); color: #2D2D2D;">
                                             ⏱ @paidCount/@totalGuests paid
                                         </span>
-                                        <button onclick="openDeleteModal('@ev.Id')" style="background: #2D2D2D; color: white; border: 2px solid #2D2D2D; border-radius: 20px; font-size: 0.72rem; font-weight: 800; padding: 5px 12px; cursor: pointer; white-space: nowrap;">
+                                        <button onclick="openDeleteModal('@ev.Id')" class="pill-badge" style="background: #2D2D2D; color: white; cursor: pointer;">
                                             🗑 Delete
                                         </button>
                                     </div>
@@ -144,32 +110,32 @@
                     </div>
                 </div>
 
-                <!-- Completed Section -->
+                <!-- Completed Events -->
                 <div>
                     <span class="step-label mb-2 d-inline-block">Completed</span>
                     <div class="d-flex flex-column gap-2">
                         @if (!Model.CompletedEvents.Any())
                         {
-                            <div style="background: white; border: 2px solid #2D2D2D; border-radius: 16px; padding: 1.5rem; text-align: center; color: #2D2D2D; font-size: 0.9rem; font-weight: 600; box-shadow: 4px 4px 0px #2D2D2D;">
-                                No completed events yet. 🏁
+                            <div class="info-card" style="text-align: center; font-size: 0.9rem; font-weight: 600;">
+                                No completed events yet.
                             </div>
                         }
                         else
                         {
                             @foreach (var ev in Model.CompletedEvents)
                             {
-                                <div style="background: #B8EDD8; border: 2px solid #2D2D2D; border-radius: 16px; padding: 1.1rem 1.5rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 4px 4px 0px #2D2D2D;">
+                                <div class="event-card" style="background: var(--green);">
                                     <a href="#" onclick="openDetailsPanel('@ev.Id'); return false;" class="text-decoration-none" style="flex: 1;">
-                                        <div style="font-weight: 800; font-size: 1rem; color: #2D2D2D;">@ev.Title</div>
-                                        <div style="font-size: 0.8rem; color: #555; margin-top: 3px;">
-                                            📅 @ev.Date.ToString("MMM dd, yyyy") &nbsp;👥 @ev.Participants.Count person@(ev.Participants.Count != 1 ? "s" : "")
+                                        <div class="event-title">@ev.Title</div>
+                                        <div class="event-meta">
+                                            📅 @ev.Date.ToString("MMM dd, yyyy") · 👥 @ev.Participants.Count person@(ev.Participants.Count != 1 ? "s" : "")
                                         </div>
                                     </a>
-                                    <div style="display: flex; align-items: center; gap: 8px; flex-shrink: 0;">
-                                        <span style="background: #C9B8F5; color: #2D2D2D; border: 2px solid #2D2D2D; border-radius: 20px; font-size: 0.72rem; font-weight: 800; padding: 5px 12px; white-space: nowrap;">
-                                            ✓ Done
+                                    <div class="d-flex align-items-center gap-2" style="flex-shrink: 0;">
+                                        <span class="pill-badge" style="background: var(--purple); color: #2D2D2D;">
+                                            Done
                                         </span>
-                                        <button onclick="openDeleteModal('@ev.Id')" style="background: #2D2D2D; color: white; border: 2px solid #2D2D2D; border-radius: 20px; font-size: 0.72rem; font-weight: 800; padding: 5px 12px; cursor: pointer; white-space: nowrap;">
+                                        <button onclick="openDeleteModal('@ev.Id')" class="pill-badge" style="background: #2D2D2D; color: white; cursor: pointer;">
                                             🗑 Delete
                                         </button>
                                     </div>
@@ -186,69 +152,29 @@
 
 @section Scripts {
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const deleteModal = document.getElementById('deleteModal');
-            if (deleteModal) {
-                deleteModal.addEventListener('click', function (e) {
-                    if (e.target === this) closeDeleteModal();
-                });
-            }
-
-            const deleteExpenseModal = document.getElementById('deleteExpenseModal');
-            if (deleteExpenseModal) {
-                deleteExpenseModal.addEventListener('click', function (e) {
-                    if (e.target === this) closeDeleteExpenseModal();
-                });
-
-                deleteExpenseModal.querySelector('#deleteExpenseForm').addEventListener('submit', function (e) {
-                    e.preventDefault();
-                    const formData = new FormData(this);
-                    fetch('/Event/DeleteExpense', {
-                        method: 'POST',
-                        body: formData
-                    }).then(res => {
-                        if (res.ok) {
-                            closeDeleteExpenseModal();
-                            const wrapper = document.querySelector('#eventDetailWrapper');
-                            if (wrapper) refreshDetailsPanel(wrapper.dataset.eventId);
-                        }
-                    });
-                });
-            }
-        });
-
+        // modal helpers
         function openDeleteModal(eventId) {
             document.getElementById('deleteEventId').value = eventId;
             document.getElementById('deleteModal').style.display = 'flex';
         }
-
         function closeDeleteModal() {
             document.getElementById('deleteModal').style.display = 'none';
         }
 
-        function openDeleteExpenseModal(expenseId, eventId) {
-            document.getElementById('deleteExpenseId').value = expenseId;
-            document.getElementById('deleteExpenseEventId').value = eventId;
-            document.getElementById('deleteExpenseModal').style.display = 'flex';
-        }
-
-        function closeDeleteExpenseModal() {
-            document.getElementById('deleteExpenseModal').style.display = 'none';
-        }
-
+        // create panel
         function openCreatePanel() {
             document.getElementById('createOverlay').style.display = 'block';
             document.getElementById('createPanel').style.right = '0';
         }
-
         function closeCreatePanel() {
             document.getElementById('createOverlay').style.display = 'none';
             document.getElementById('createPanel').style.right = '-450px';
         }
 
+        // details panel
         function openDetailsPanel(eventId) {
             fetch('/Event/DetailsPartial/' + eventId)
-                .then(res => res.text())
+                .then(r => r.text())
                 .then(html => {
                     document.getElementById('detailsPanelContent').innerHTML = html;
                     document.getElementById('detailsOverlay').style.display = 'block';
@@ -256,65 +182,68 @@
                     initDetailsPanel();
                 });
         }
-
         function closeDetailsPanel() {
             document.getElementById('detailsOverlay').style.display = 'none';
             document.getElementById('detailsPanel').style.right = '-520px';
         }
 
+        // set up tab switching and ajax forms inside the details panel
         function initDetailsPanel() {
-            const content = document.getElementById('detailsPanelContent');
-            const wrapper = content.querySelector('#eventDetailWrapper');
+            var content = document.getElementById('detailsPanelContent');
+            var wrapper = content.querySelector('#eventDetailWrapper');
             if (!wrapper) return;
-            const eventId = wrapper.dataset.eventId;
+            var eventId = wrapper.dataset.eventId;
 
-            const tabButtons = content.querySelectorAll('.detail-tab-btn');
-            const tabPanels = content.querySelectorAll('.detail-tab-panel');
-
-            tabButtons.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const target = btn.dataset.tab;
-                    tabButtons.forEach(b => {
-                        b.style.background = b.dataset.tab === target ? '#2D2D2D' : 'white';
-                        b.style.color = b.dataset.tab === target ? 'white' : '#2D2D2D';
+            // tabs
+            content.querySelectorAll('.detail-tab-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    var target = btn.dataset.tab;
+                    content.querySelectorAll('.detail-tab-btn').forEach(function(b) {
+                        var isActive = b.dataset.tab === target;
+                        b.style.background = isActive ? '#2D2D2D' : 'white';
+                        b.style.color = isActive ? 'white' : '#2D2D2D';
+                        if (isActive) b.classList.add('active');
+                        else b.classList.remove('active');
                     });
-                    tabPanels.forEach(p => {
+                    content.querySelectorAll('.detail-tab-panel').forEach(function(p) {
                         p.style.display = p.dataset.tab === target ? 'block' : 'none';
                     });
                 });
             });
 
-            const expenseToggleBtn = content.querySelector('.add-expense-toggle');
-            if (expenseToggleBtn) {
-                expenseToggleBtn.addEventListener('click', () => {
-                    const form = content.querySelector('#expenseForm');
+            // expense form toggle
+            var toggleBtn = content.querySelector('.add-expense-toggle');
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', function() {
+                    var form = content.querySelector('#expenseForm');
                     form.style.display = form.style.display === 'none' ? 'block' : 'none';
                 });
             }
 
-                    const copyBtn = content.querySelector('.copy-invite-btn');
-        if (copyBtn) {
-            copyBtn.addEventListener('click', () => {
-                navigator.clipboard.writeText(copyBtn.dataset.code).then(() => {
-                    const original = copyBtn.innerHTML;
-                    copyBtn.innerHTML = '✓ Copied!';
-                    copyBtn.style.background = '#B8EDD8';
-                    setTimeout(() => {
-                        copyBtn.innerHTML = original;
-                        copyBtn.style.background = '#FFE68C';
-                    }, 2000);
+            // copy invite code
+            var copyBtn = content.querySelector('.copy-invite-btn');
+            if (copyBtn) {
+                copyBtn.addEventListener('click', function() {
+                    navigator.clipboard.writeText(copyBtn.dataset.code).then(function() {
+                        var original = copyBtn.innerHTML;
+                        copyBtn.innerHTML = 'Copied!';
+                        copyBtn.style.background = '#B8EDD8';
+                        setTimeout(function() {
+                            copyBtn.innerHTML = original;
+                            copyBtn.style.background = '#FFE68C';
+                        }, 2000);
+                    });
                 });
-            });
-        }
+            }
 
-            content.querySelectorAll('.ajax-form').forEach(form => {
-                form.addEventListener('submit', function (e) {
+            // ajax forms (add expense, mark paid)
+            content.querySelectorAll('.ajax-form').forEach(function(form) {
+                form.addEventListener('submit', function(e) {
                     e.preventDefault();
-                    const formData = new FormData(form);
                     fetch(form.action, {
                         method: 'POST',
-                        body: formData
-                    }).then(res => {
+                        body: new FormData(form)
+                    }).then(function(res) {
                         if (res.ok) refreshDetailsPanel(eventId);
                     });
                 });
@@ -322,119 +251,113 @@
         }
 
         function refreshDetailsPanel(eventId) {
-    // Remember the active tab before refreshing
-    const activeTab = document.querySelector('.detail-tab-btn.active')?.dataset.tab || 'info';
+            // save which tab is open before refreshing
+            var activeBtn = document.querySelector('#detailsPanelContent .detail-tab-btn.active');
+            var activeTab = activeBtn ? activeBtn.dataset.tab : 'info';
 
-    fetch('/Event/DetailsPartial/' + eventId)
-        .then(res => res.text())
-        .then(html => {
-            document.getElementById('detailsPanelContent').innerHTML = html;
-            initDetailsPanel();
+            fetch('/Event/DetailsPartial/' + eventId)
+                .then(r => r.text())
+                .then(html => {
+                    document.getElementById('detailsPanelContent').innerHTML = html;
+                    initDetailsPanel();
 
-            // Re-activate the same tab after refresh
-            const tabBtn = document.querySelector(`.detail-tab-btn[data-tab="${activeTab}"]`);
-            if (tabBtn) tabBtn.click();
+                    // restore the tab
+                    var tabBtn = document.querySelector('#detailsPanelContent .detail-tab-btn[data-tab="' + activeTab + '"]');
+                    if (tabBtn) tabBtn.click();
+
+                    // also update the paid badge on the dashboard card
+                    var panel = document.getElementById('detailsPanelContent');
+                    var match = panel.textContent.match(/(\d+)\/(\d+) paid/);
+                    if (match) {
+                        var card = document.querySelector('[data-event-card="' + eventId + '"]');
+                        if (card) {
+                            var badge = card.querySelector('.paid-badge');
+                            if (badge) badge.textContent = match[1] + '/' + match[2] + ' paid';
+                        }
+                    }
+                });
+        }
+
+        // close modal on overlay click
+        document.addEventListener('DOMContentLoaded', function() {
+            var deleteModal = document.getElementById('deleteModal');
+            if (deleteModal) {
+                deleteModal.addEventListener('click', function(e) {
+                    if (e.target === this) closeDeleteModal();
+                });
+            }
         });
-}
 
-        function openAddMemberModal(eventId) {
-            const modal = document.getElementById('addMemberModal');
-            modal.style.display = 'flex';
+    // details panel modal functions
+    // edit expense
+    function openEditExpenseModal(expenseId, description, amount, paidByParticipantId, splitIdsStr) {
+        var modal = document.getElementById('editExpenseModal');
+        modal.style.display = 'flex';
 
-            const oldBtn = document.getElementById('confirmAddMemberBtn');
-            const newBtn = oldBtn.cloneNode(true);
-            oldBtn.parentNode.replaceChild(newBtn, oldBtn);
+        document.getElementById('editExpenseId').value = expenseId;
+        document.getElementById('editExpenseDescription').value = description;
+        document.getElementById('editExpenseAmount').value = amount;
+        document.getElementById('editExpensePaidBy').value = paidByParticipantId;
 
-            newBtn.addEventListener('click', function () {
-                const name = document.getElementById('newMemberName').value.trim();
-                if (!name) {
-                    document.getElementById('newMemberName').focus();
-                    return;
-                }
+        var splitIds = splitIdsStr ? splitIdsStr.split(',') : [];
+        document.querySelectorAll('.edit-split-checkbox').forEach(function(cb) {
+            cb.checked = splitIds.includes(cb.value);
+        });
 
-                const contribution = document.getElementById('newMemberContribution').value.trim();
-                const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+        modal.onclick = function(e) { if (e.target === modal) closeEditExpenseModal(); };
+    }
 
-                const formData = new FormData();
-                formData.append('eventId', eventId);
-                formData.append('name', name);
-                formData.append('contribution', contribution);
-                formData.append('__RequestVerificationToken', token);
+    function closeEditExpenseModal() {
+        document.getElementById('editExpenseModal').style.display = 'none';
+    }
 
-                fetch('/Event/AddMember', {
-                    method: 'POST',
-                    body: formData
-                }).then(res => {
+    // add member
+    function openAddMemberModal() {
+        var modal = document.getElementById('addMemberModal');
+        modal.style.display = 'flex';
+        document.getElementById('newMemberName').value = '';
+        document.getElementById('newMemberContribution').value = '';
+
+        modal.onclick = function(e) { if (e.target === modal) closeAddMemberModal(); };
+    }
+
+    function closeAddMemberModal() {
+        document.getElementById('addMemberModal').style.display = 'none';
+        document.getElementById('newMemberName').value = '';
+        document.getElementById('newMemberContribution').value = '';
+    }
+
+    // delete expense
+    function openDeleteExpenseModal(expenseId, eventId) {
+        var modal = document.getElementById('deleteExpenseModal');
+        modal.style.display = 'flex';
+
+        var oldBtn = document.getElementById('confirmDeleteExpenseBtn');
+        var newBtn = oldBtn.cloneNode(true);
+        oldBtn.parentNode.replaceChild(newBtn, oldBtn);
+
+        newBtn.addEventListener('click', function() {
+            var formData = new FormData();
+            formData.append('expenseId', expenseId);
+            formData.append('eventId', eventId);
+
+            var token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            formData.append('__RequestVerificationToken', token);
+
+            fetch('/Event/DeleteExpense', { method: 'POST', body: formData })
+                .then(function(res) {
                     if (res.ok) {
-                        closeAddMemberModal();
+                        closeDeleteExpenseModal();
                         refreshDetailsPanel(eventId);
                     }
                 });
-            });
+        });
 
-            modal.onclick = function (e) {
-                if (e.target === modal) closeAddMemberModal();
-            };
-        }
+        modal.onclick = function(e) { if (e.target === modal) closeDeleteExpenseModal(); };
+    }
 
-        function closeAddMemberModal() {
-            const modal = document.getElementById('addMemberModal');
-            if (modal) modal.style.display = 'none';
-            document.getElementById('newMemberName').value = '';
-            document.getElementById('newMemberContribution').value = '';
-        }
-                function openEditExpenseModal(expenseId, description, amount, paidByParticipantId, splitIdsStr) {
-            const modal = document.getElementById('editExpenseModal');
-            modal.style.display = 'flex';
-
-            document.getElementById('editExpenseDescription').value = description;
-            document.getElementById('editExpenseAmount').value = amount;
-            document.getElementById('editExpensePaidBy').value = paidByParticipantId;
-
-            const splitIds = splitIdsStr ? splitIdsStr.split(',') : [];
-            document.querySelectorAll('.edit-split-checkbox').forEach(cb => {
-                cb.checked = splitIds.includes(cb.value);
-            });
-
-            const oldBtn = document.getElementById('confirmEditExpenseBtn');
-            const newBtn = oldBtn.cloneNode(true);
-            oldBtn.parentNode.replaceChild(newBtn, oldBtn);
-
-            newBtn.addEventListener('click', function () {
-                const formData = new FormData();
-                formData.append('expenseId', expenseId);
-                formData.append('description', document.getElementById('editExpenseDescription').value.trim());
-                formData.append('amount', document.getElementById('editExpenseAmount').value);
-                formData.append('paidByParticipantId', document.getElementById('editExpensePaidBy').value);
-
-                document.querySelectorAll('.edit-split-checkbox:checked').forEach(cb => {
-                    formData.append('splitParticipantIds', cb.value);
-                });
-
-                const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
-                formData.append('__RequestVerificationToken', token);
-
-                fetch('/Event/EditExpense', {
-                    method: 'POST',
-                    body: formData
-                }).then(res => {
-                    if (res.ok) {
-                        closeEditExpenseModal();
-                        const eventId = document.getElementById('eventDetailWrapper').dataset.eventId;
-                        refreshDetailsPanel(eventId);
-                    }
-                });
-            });
-
-            modal.onclick = function (e) {
-                if (e.target === modal) closeEditExpenseModal();
-            };
-        }
-
-        function closeEditExpenseModal() {
-            const modal = document.getElementById('editExpenseModal');
-            if (modal) modal.style.display = 'none';
-        }
+    function closeDeleteExpenseModal() {
+        document.getElementById('deleteExpenseModal').style.display = 'none';
+    }
     </script>
-}
 }

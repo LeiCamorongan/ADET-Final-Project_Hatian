@@ -1,4 +1,4 @@
-﻿@model Hatian.Models.ViewModels.EventDetailViewModel
+@model Hatian.Models.ViewModels.EventDetailViewModel
 @using Hatian.Models.Entities
 @{
     var ev = Model.Event;
@@ -7,6 +7,7 @@
     var progress = totalGuests == 0 ? 0 : (int)((double)paidCount / totalGuests * 100);
     string[] avatarColors = { "#FFB5C6", "#FFE68C", "#B8EDD8", "#C9B8F5" };
 
+    
     var debts = new Dictionary<string, (string OwesName, decimal Amount)>();
     foreach (var exp in Model.Expenses)
     {
@@ -30,45 +31,33 @@
 <div id="eventDetailWrapper" data-event-id="@ev.Id">
 
     <!-- Header -->
-    <div style="background: #FFB5C6; border: 2px solid #2D2D2D; border-radius: 16px; padding: 1.25rem 1.5rem; margin-bottom: 1.25rem;">
-        <div style="font-size: 0.75rem; font-weight: 700; color: #555; text-transform: uppercase; letter-spacing: 1px;">Event</div>
-        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+    <div class="event-header-card">
+        <div class="section-label">Event</div>
+        <div class="d-flex justify-content-between align-items-start">
             <div style="font-size: 1.6rem; font-weight: 900; color: #2D2D2D;">@ev.Title</div>
-            <span style="background: white; border: 2px solid #2D2D2D; border-radius: 999px; padding: 4px 12px; font-size: 0.72rem; font-weight: 800; color: #2D2D2D;">
-                @ev.Status
-            </span>
+            <span class="pill-badge" style="background: white; color: #2D2D2D;">@ev.Status</span>
         </div>
         <div style="font-size: 0.85rem; color: #444; margin-top: 0.5rem;">
-            📅 @ev.Date.ToString("MMMM dd, yyyy") &nbsp; 👥 @Model.Participants.Count people
+            📅 @ev.Date.ToString("MMMM dd, yyyy") · 👥 @Model.Participants.Count people
         </div>
     </div>
 
     <!-- Tabs -->
-    <div style="display: flex; gap: 8px; margin-bottom: 1.25rem;">
-        <button class="detail-tab-btn active" data-tab="info"
-                style="flex:1; background:#2D2D2D; color:white; border:2px solid #2D2D2D; border-radius:999px; padding:8px 0; font-weight:800; font-size:0.85rem; cursor:pointer;">
-            Info
-        </button>
-        <button class="detail-tab-btn" data-tab="contributions"
-                style="flex:1; background:white; color:#2D2D2D; border:2px solid #2D2D2D; border-radius:999px; padding:8px 0; font-weight:800; font-size:0.85rem; cursor:pointer;">
-            Contributions
-        </button>
-        <button class="detail-tab-btn" data-tab="expenses"
-                style="flex:1; background:white; color:#2D2D2D; border:2px solid #2D2D2D; border-radius:999px; padding:8px 0; font-weight:800; font-size:0.85rem; cursor:pointer;">
-            Expenses
-        </button>
+    <div class="d-flex gap-2" style="margin-bottom: 1.25rem;">
+        <button class="detail-tab-btn tab-btn active" data-tab="info">Info</button>
+        <button class="detail-tab-btn tab-btn" data-tab="contributions">Contributions</button>
+        <button class="detail-tab-btn tab-btn" data-tab="expenses">Expenses</button>
     </div>
 
     <!-- INFO TAB -->
     <div class="detail-tab-panel" data-tab="info">
 
-        <div style="background: white; border: 2px solid #2D2D2D; border-radius: 16px; padding: 1.25rem; margin-bottom: 1rem; box-shadow: 4px 4px 0px #2D2D2D;">
-            <div style="font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #888; margin-bottom: 0.5rem;">Invite Code</div>
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <div style="font-size: 2rem; font-weight: 900; color: #2D2D2D; letter-spacing: 4px;">@ev.InviteToken</div>
-                <button class="copy-invite-btn" data-code="@ev.InviteToken"
-                        style="background:#FFE68C; border:2px solid #2D2D2D; border-radius:999px; padding:8px 18px; font-weight:800; font-size:0.8rem; cursor:pointer;">
-                    📋 Copy
+        <div class="info-card" style="margin-bottom: 1rem;">
+            <div class="section-label" style="margin-bottom: 0.5rem;">Invite Code</div>
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="invite-code">@ev.InviteToken</div>
+                <button class="copy-invite-btn btn-copy" data-code="@ev.InviteToken">
+                    Copy
                 </button>
             </div>
             <div style="font-size: 0.8rem; color: #888; margin-top: 0.75rem;">Share this code with your friends to let them join.</div>
@@ -76,17 +65,17 @@
 
         @if (!string.IsNullOrWhiteSpace(ev.Description))
         {
-            <div style="background: white; border: 2px solid #2D2D2D; border-radius: 16px; padding: 1.25rem; margin-bottom: 1rem; box-shadow: 4px 4px 0px #2D2D2D;">
-                <div style="font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #888; margin-bottom: 0.5rem;">About This Event</div>
+            <div class="info-card" style="margin-bottom: 1rem;">
+                <div class="section-label" style="margin-bottom: 0.5rem;">About This Event</div>
                 <div style="font-size: 0.95rem; color: #2D2D2D;">@ev.Description</div>
             </div>
         }
 
-        <div style="background: white; border: 2px solid #2D2D2D; border-radius: 16px; padding: 1.25rem; box-shadow: 4px 4px 0px #2D2D2D;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.75rem;">
-                <div style="font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #888;">Who's Bringing What</div>
+        <div class="info-card">
+            <div class="d-flex justify-content-between align-items-center" style="margin-bottom: 0.75rem;">
+                <div class="section-label">Who's Bringing What</div>
                 <button onclick="openAddMemberModal('@ev.Id')"
-                        style="background:#B8EDD8; border:2px solid #2D2D2D; border-radius:999px; padding:4px 14px; font-weight:800; font-size:0.8rem; cursor:pointer;">
+                        style="background: var(--green); border: var(--border); border-radius: 999px; padding: 4px 14px; font-weight: 800; font-size: 0.8rem; cursor: pointer;">
                     + Add
                 </button>
             </div>
@@ -96,10 +85,8 @@
                     var p = Model.Participants[i];
                     var initial = p.Name.Length > 0 ? p.Name.Substring(0, 1).ToUpper() : "?";
                     var color = avatarColors[i % avatarColors.Length];
-                    <div style="display:flex; align-items:center; gap:12px;">
-                        <div style="width:40px; height:40px; flex-shrink:0; border-radius:50%; background:@color; border:2px solid #2D2D2D; display:flex; align-items:center; justify-content:center; font-weight:800; color:#2D2D2D;">
-                            @initial
-                        </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="avatar-circle lg" style="background:@color;">@initial</div>
                         <div>
                             <div style="font-weight:800; color:#2D2D2D; font-size:0.95rem;">
                                 @p.Name @(p.IsOrganizer ? "(you)" : "")
@@ -118,20 +105,21 @@
     <!-- CONTRIBUTIONS TAB -->
     <div class="detail-tab-panel" data-tab="contributions" style="display:none;">
 
-        <div style="background: white; border: 2px solid #2D2D2D; border-radius: 16px; padding: 1.25rem; margin-bottom: 1rem; box-shadow: 4px 4px 0px #2D2D2D;">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 0.75rem;">
+        <!-- Payment Progress -->
+        <div class="info-card" style="margin-bottom: 1rem;">
+            <div class="d-flex justify-content-between align-items-center" style="margin-bottom: 0.75rem;">
                 <div style="font-weight:800; font-size:1rem; color:#2D2D2D;">Payment Progress</div>
                 <div style="font-size:0.85rem; color:#888; font-weight:700;">@paidCount/@totalGuests paid</div>
             </div>
-            <div style="background:#F0F0F0; border-radius:999px; height:10px; overflow:hidden;">
-                <div style="background:#B8EDD8; height:100%; width:@(progress)%;"></div>
+            <div class="progress-track">
+                <div class="progress-fill" style="width:@(progress)%;"></div>
             </div>
         </div>
 
         @if (debts.Any())
         {
-            <div style="background: white; border: 2px solid #2D2D2D; border-radius: 16px; padding: 1.25rem; margin-bottom: 1rem; box-shadow: 4px 4px 0px #2D2D2D;">
-                <div style="font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #888; margin-bottom: 0.75rem;">Who Owes Who</div>
+            <div class="info-card" style="margin-bottom: 1rem;">
+                <div class="section-label" style="margin-bottom: 0.75rem;">Who Owes Who</div>
                 <div class="d-flex flex-column gap-2">
                     @foreach (var kv in debts)
                     {
@@ -139,10 +127,8 @@
                         var debtorInitial = debtorParticipant?.Name.Substring(0, 1).ToUpper() ?? "?";
                         var debtorIdx = Model.Participants.IndexOf(debtorParticipant!);
                         var debtorColor = debtorIdx >= 0 ? avatarColors[debtorIdx % avatarColors.Length] : "#EEE";
-                        <div style="display:flex; align-items:center; gap:12px;">
-                            <div style="width:36px; height:36px; flex-shrink:0; border-radius:50%; background:@debtorColor; border:2px solid #2D2D2D; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:0.8rem; color:#2D2D2D;">
-                                @debtorInitial
-                            </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <div class="avatar-circle md" style="background:@debtorColor;">@debtorInitial</div>
                             <div style="flex:1; font-size:0.9rem; color:#2D2D2D;">
                                 <span style="font-weight:800;">@debtorParticipant?.Name</span> owes <span style="font-weight:800;">@kv.Value.OwesName</span>
                             </div>
@@ -153,12 +139,12 @@
             </div>
         }
 
-        <div style="font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #888; margin-bottom: 0.5rem;">Mark As Paid</div>
+        <div class="section-label" style="margin-bottom: 0.5rem;">Mark As Paid</div>
         <div class="d-flex flex-column gap-2">
             @foreach (var p in Model.Participants.Where(p => !p.IsOrganizer))
             {
                 var debtAmount = debts.ContainsKey(p.Id.ToString()) ? debts[p.Id.ToString()].Amount : 0;
-                <div style="background:white; border:2px solid #2D2D2D; border-radius:16px; padding:1rem 1.25rem; display:flex; justify-content:space-between; align-items:center; box-shadow:4px 4px 0px #2D2D2D;">
+                <div class="mark-paid-card">
                     <div>
                         <div style="font-weight:800; color:#2D2D2D; font-size:0.95rem;">@p.Name</div>
                         <div style="font-size:0.8rem; color:#888;">
@@ -178,16 +164,14 @@
                     </div>
                     @if (p.IsPaid)
                     {
-                        <span style="background:#B8EDD8; border:2px solid #2D2D2D; border-radius:999px; padding:6px 16px; font-weight:800; font-size:0.8rem;">✓ Paid</span>
+                        <span class="paid-status-badge">Paid</span>
                     }
                     else
                     {
                         <form class="ajax-form" method="post" asp-controller="Event" asp-action="MarkAsPaid">
                             <input type="hidden" name="participantId" value="@p.Id" />
                             <input type="hidden" name="eventId" value="@ev.Id" />
-                            <button type="submit" style="background:#FFE68C; border:2px solid #2D2D2D; border-radius:999px; padding:6px 16px; font-weight:800; font-size:0.8rem; cursor:pointer;">
-                                Mark Paid
-                            </button>
+                            <button type="submit" class="btn-mark-paid">Mark Paid</button>
                         </form>
                     }
                 </div>
@@ -199,62 +183,55 @@
     <!-- EXPENSES TAB -->
     <div class="detail-tab-panel" data-tab="expenses" style="display:none;">
 
-        <button class="add-expense-toggle"
-                style="width:100%; background:#2D2D2D; color:white; border:2px solid #2D2D2D; border-radius:999px; padding:0.9rem; font-weight:800; font-size:0.95rem; cursor:pointer; margin-bottom:1rem;">
+        <button class="add-expense-toggle btn-dark-pill" style="margin-bottom:1rem;">
             + Add Expense
         </button>
 
-        <div id="expenseForm" style="display:none; background:white; border:2px solid #2D2D2D; border-radius:16px; padding:1.25rem; margin-bottom:1rem; box-shadow:4px 4px 0px #2D2D2D;">
-            <form class="ajax-form" method="post" asp-controller="Event" asp-action="AddExpense">
-                <input type="hidden" name="NewExpense.EventId" value="@ev.Id" />
-                <div class="mb-2">
-                    <label class="form-label fw-bold">Description</label>
-                    <input name="NewExpense.Description" class="form-control hatian-input" placeholder="e.g. Dinner" />
-                </div>
-                <div class="mb-2">
-                    <label class="form-label fw-bold">Amount</label>
-                    <input name="NewExpense.Amount" type="number" step="0.01" class="form-control hatian-input" placeholder="0.00" />
-                </div>
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Paid By</label>
-                    <select name="NewExpense.PaidByParticipantId" class="form-control hatian-input">
-                        @foreach (var p in Model.Participants)
-                        {
-                            <option value="@p.Id">@p.Name</option>
-                        }
-                    </select>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label fw-bold">Split Among</label>
-                    <div style="background:#F9F9F9; border:2px solid #2D2D2D; border-radius:12px; padding:0.75rem;">
-                        @for (int i = 0; i < Model.Participants.Count; i++)
-                        {
-                            var p = Model.Participants[i];
-                            var color = avatarColors[i % avatarColors.Length];
-                            var initial = p.Name.Length > 0 ? p.Name.Substring(0, 1).ToUpper() : "?";
-                            <label style="display:flex; align-items:center; gap:10px; padding:6px 4px; cursor:pointer;">
-                                <input type="checkbox"
-                                       name="NewExpense.SplitAmongParticipantIds"
-                                       value="@p.Id"
-                                       checked
-                                       style="width:16px; height:16px; accent-color:#2D2D2D; cursor:pointer;" />
-                                <div style="width:28px; height:28px; border-radius:50%; background:@color; border:2px solid #2D2D2D; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:0.7rem; color:#2D2D2D; flex-shrink:0;">
-                                    @initial
-                                </div>
-                                <span style="font-weight:700; color:#2D2D2D; font-size:0.9rem;">@p.Name</span>
-                            </label>
-                        }
+        <div id="expenseForm" style="display:none; margin-bottom:1rem;">
+            <div class="info-card">
+                <form class="ajax-form" method="post" asp-controller="Event" asp-action="AddExpense">
+                    <input type="hidden" name="NewExpense.EventId" value="@ev.Id" />
+                    <div class="mb-2">
+                        <label class="form-label fw-bold">Description</label>
+                        <input name="NewExpense.Description" class="form-control hatian-input" placeholder="e.g. Dinner" required />
                     </div>
-                </div>
-                <button type="submit" class="btn rounded-pill w-100 fw-bold" style="background:#2D2D2D; color:white; border:none; padding:0.7rem;">
-                    Save Expense
-                </button>
-            </form>
+                    <div class="mb-2">
+                        <label class="form-label fw-bold">Amount</label>
+                        <input name="NewExpense.Amount" type="number" step="0.01" class="form-control hatian-input" placeholder="0.00" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Paid By</label>
+                        <select name="NewExpense.PaidByParticipantId" class="form-control hatian-input">
+                            @foreach (var p in Model.Participants)
+                            {
+                                <option value="@p.Id">@p.Name</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Split Among</label>
+                        <div class="split-list">
+                            @for (int i = 0; i < Model.Participants.Count; i++)
+                            {
+                                var p = Model.Participants[i];
+                                var color = avatarColors[i % avatarColors.Length];
+                                var initial = p.Name.Length > 0 ? p.Name.Substring(0, 1).ToUpper() : "?";
+                                <label>
+                                    <input type="checkbox" name="NewExpense.SplitAmongParticipantIds" value="@p.Id" checked />
+                                    <div class="avatar-circle sm" style="background:@color;">@initial</div>
+                                    <span style="font-weight:700; color:#2D2D2D; font-size:0.9rem;">@p.Name</span>
+                                </label>
+                            }
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-step">Save Expense</button>
+                </form>
+            </div>
         </div>
 
         @if (!Model.Expenses.Any())
         {
-            <div style="background:white; border:2px solid #2D2D2D; border-radius:16px; padding:2.5rem 1.5rem; text-align:center; box-shadow:4px 4px 0px #2D2D2D;">
+            <div class="info-card" style="padding:2.5rem 1.5rem; text-align:center;">
                 <div style="font-size:2rem; margin-bottom:0.5rem;">🧾</div>
                 <div style="font-weight:800; color:#2D2D2D; font-size:0.95rem;">No expenses yet</div>
                 <div style="font-size:0.8rem; color:#888;">Add the first one above.</div>
@@ -268,39 +245,37 @@
                     var splitCount = exp.Splits?.Count ?? 1;
                     var perPerson = splitCount > 0 ? exp.Amount / splitCount : exp.Amount;
                     var splitIds = string.Join(",", exp.Splits != null ? exp.Splits.Select(s => s.ParticipantId.ToString()) : Enumerable.Empty<string>());
-                    <div style="background:white; border:2px solid #2D2D2D; border-radius:16px; padding:1rem 1.25rem; box-shadow:4px 4px 0px #2D2D2D;">
-                        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:0.5rem;">
+                    <div class="info-card">
+                        <div class="d-flex justify-content-between align-items-start" style="margin-bottom:0.5rem;">
                             <div style="flex:1;">
                                 <div style="font-weight:800; color:#2D2D2D; font-size:0.95rem;">@exp.Description</div>
                                 <div style="font-size:0.8rem; color:#888;">Paid by @exp.PaidBy?.Name · @splitCount people</div>
                             </div>
-                            <div style="display:flex; align-items:flex-start; gap:8px;">
+                            <div class="d-flex align-items-start gap-2">
                                 <div style="text-align:right;">
                                     <div style="font-weight:900; color:#2D2D2D; font-size:1rem;">₱@exp.Amount.ToString("0.00")</div>
                                     <div style="font-size:0.75rem; color:#888;">₱@perPerson.ToString("0.00")/ea</div>
                                 </div>
                                 <button onclick="openEditExpenseModal('@exp.Id', '@exp.Description', @exp.Amount, '@exp.PaidByParticipantId', '@splitIds')"
-                                        style="background:#FFE68C; border:2px solid #2D2D2D; border-radius:50%; width:28px; height:28px; font-size:0.75rem; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                                        class="btn-circle-sm" style="background: var(--yellow);">
                                     ✏️
                                 </button>
                                 <button onclick="openDeleteExpenseModal('@exp.Id', '@ev.Id')"
-                                        style="background:#FFB5C6; border:2px solid #2D2D2D; border-radius:50%; width:28px; height:28px; font-size:0.75rem; cursor:pointer; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+                                        class="btn-circle-sm" style="background: var(--pink);">
                                     🗑
                                 </button>
                             </div>
                         </div>
                         @if (exp.Splits != null && exp.Splits.Any())
                         {
-                            <div style="display:flex; gap:4px; flex-wrap:wrap;">
+                            <div class="d-flex gap-1 flex-wrap">
                                 @foreach (var split in exp.Splits)
                                 {
                                     var idx = Model.Participants.FindIndex(p => p.Id == split.ParticipantId);
                                     var sc = idx >= 0 ? avatarColors[idx % avatarColors.Length] : "#EEE";
                                     var si = idx >= 0 && Model.Participants[idx].Name.Length > 0
                                         ? Model.Participants[idx].Name.Substring(0, 1).ToUpper() : "?";
-                                    <div style="width:28px; height:28px; border-radius:50%; background:@sc; border:2px solid #2D2D2D; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:0.7rem; color:#2D2D2D;">
-                                        @si
-                                    </div>
+                                    <div class="avatar-circle sm" style="background:@sc;">@si</div>
                                 }
                             </div>
                         }
@@ -314,20 +289,21 @@
 </div>
 
 <!-- Edit Expense Modal -->
-<div id="editExpenseModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:9999; align-items:center; justify-content:center;">
-    <div style="background:white; border:2px solid #2D2D2D; border-radius:24px; box-shadow:6px 6px 0px #2D2D2D; padding:2rem; max-width:420px; width:90%; max-height:90vh; overflow-y:auto;">
-        <div style="font-size:1.2rem; font-weight:900; color:#2D2D2D; margin-bottom:1.5rem; text-align:center;">✏️ Edit Expense</div>
+<div id="editExpenseModal" class="modal-overlay">
+    <form class="modal-box wide ajax-form" method="post" asp-controller="Event" asp-action="EditExpense">
+        <input type="hidden" id="editExpenseId" name="expenseId" />
+        <div style="font-size:1.2rem; font-weight:900; color:#2D2D2D; margin-bottom:1.5rem; text-align:center;">Edit Expense</div>
         <div class="mb-3">
             <label class="form-label fw-bold">Description</label>
-            <input id="editExpenseDescription" class="form-control hatian-input" />
+            <input id="editExpenseDescription" name="description" class="form-control hatian-input" required />
         </div>
         <div class="mb-3">
             <label class="form-label fw-bold">Amount</label>
-            <input id="editExpenseAmount" type="number" step="0.01" class="form-control hatian-input" />
+            <input id="editExpenseAmount" name="amount" type="number" step="0.01" class="form-control hatian-input" required />
         </div>
         <div class="mb-3">
             <label class="form-label fw-bold">Paid By</label>
-            <select id="editExpensePaidBy" class="form-control hatian-input">
+            <select id="editExpensePaidBy" name="paidByParticipantId" class="form-control hatian-input">
                 @foreach (var p in Model.Participants)
                 {
                     <option value="@p.Id">@p.Name</option>
@@ -336,219 +312,55 @@
         </div>
         <div class="mb-4">
             <label class="form-label fw-bold">Split Among</label>
-            <div style="background:#F9F9F9; border:2px solid #2D2D2D; border-radius:12px; padding:0.75rem;">
+            <div class="split-list">
                 @for (int i = 0; i < Model.Participants.Count; i++)
                 {
                     var p = Model.Participants[i];
                     var color = avatarColors[i % avatarColors.Length];
                     var initial = p.Name.Length > 0 ? p.Name.Substring(0, 1).ToUpper() : "?";
-                    <label style="display:flex; align-items:center; gap:10px; padding:6px 4px; cursor:pointer;">
-                        <input type="checkbox"
-                               class="edit-split-checkbox"
-                               value="@p.Id"
-                               style="width:16px; height:16px; accent-color:#2D2D2D; cursor:pointer;" />
-                        <div style="width:28px; height:28px; border-radius:50%; background:@color; border:2px solid #2D2D2D; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:0.7rem; color:#2D2D2D; flex-shrink:0;">
-                            @initial
-                        </div>
+                    <label>
+                        <input type="checkbox" class="edit-split-checkbox" name="splitParticipantIds" value="@p.Id" />
+                        <div class="avatar-circle sm" style="background:@color;">@initial</div>
                         <span style="font-weight:700; color:#2D2D2D; font-size:0.9rem;">@p.Name</span>
                     </label>
                 }
             </div>
         </div>
-        <div style="display:flex; gap:12px; justify-content:center;">
-            <button onclick="closeEditExpenseModal()"
-                    style="background:white; border:2px solid #2D2D2D; border-radius:999px; padding:10px 28px; font-weight:800; font-size:0.9rem; cursor:pointer; box-shadow:3px 3px 0px #2D2D2D;">
-                Cancel
-            </button>
-            <button id="confirmEditExpenseBtn" type="button"
-                    style="background:#2D2D2D; color:white; border:2px solid #2D2D2D; border-radius:999px; padding:10px 28px; font-weight:800; font-size:0.9rem; cursor:pointer; box-shadow:3px 3px 0px #2D2D2D;">
-                Save Changes
-            </button>
+        <div class="d-flex gap-2 justify-content-end">
+            <button type="button" onclick="closeEditExpenseModal()" class="btn-modal light">Cancel</button>
+            <button id="confirmEditExpenseBtn" type="submit" class="btn-modal dark">Save Changes</button>
         </div>
-    </div>
+    </form>
 </div>
 
 <!-- Add Member Modal -->
-<div id="addMemberModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:9999; align-items:center; justify-content:center;">
-    <div style="background:white; border:2px solid #2D2D2D; border-radius:24px; box-shadow:6px 6px 0px #2D2D2D; padding:2rem; max-width:400px; width:90%;">
-        <div style="font-size:1.2rem; font-weight:900; color:#2D2D2D; margin-bottom:1.5rem; text-align:center;">👤 Add Member</div>
+<div id="addMemberModal" class="modal-overlay">
+    <form class="modal-box wide ajax-form" style="max-width:400px;" method="post" asp-controller="Event" asp-action="AddMember">
+        <input type="hidden" name="eventId" value="@ev.Id" />
+        <div style="font-size:1.2rem; font-weight:900; color:#2D2D2D; margin-bottom:1.5rem; text-align:center;">Add Member</div>
         <div class="mb-3">
             <label class="form-label fw-bold">Name</label>
-            <input id="newMemberName" class="form-control hatian-input" placeholder="e.g. Jungkook" />
+            <input id="newMemberName" name="name" class="form-control hatian-input" placeholder="e.g. Jungkook" required />
         </div>
         <div class="mb-4">
             <label class="form-label fw-bold">Contribution</label>
-            <input id="newMemberContribution" class="form-control hatian-input" placeholder="e.g. Snacks (optional)" />
+            <input id="newMemberContribution" name="contribution" class="form-control hatian-input" placeholder="e.g. Snacks (optional)" />
         </div>
-        <div style="display:flex; gap:12px; justify-content:center;">
-            <button onclick="closeAddMemberModal()"
-                    style="background:white; border:2px solid #2D2D2D; border-radius:999px; padding:10px 28px; font-weight:800; font-size:0.9rem; cursor:pointer; box-shadow:3px 3px 0px #2D2D2D;">
-                Cancel
-            </button>
-            <button id="confirmAddMemberBtn" type="button"
-                    style="background:#2D2D2D; color:white; border:2px solid #2D2D2D; border-radius:999px; padding:10px 28px; font-weight:800; font-size:0.9rem; cursor:pointer; box-shadow:3px 3px 0px #2D2D2D;">
-                Add Member
-            </button>
+        <div class="d-flex gap-3 justify-content-center">
+            <button type="button" onclick="closeAddMemberModal()" class="btn-modal light">Cancel</button>
+            <button type="submit" class="btn-modal dark">Add Member</button>
         </div>
-    </div>
+    </form>
 </div>
 
 <!-- Delete Expense Modal -->
-<div id="deleteExpenseModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:9999; align-items:center; justify-content:center;">
-    <div style="background:white; border:2px solid #2D2D2D; border-radius:24px; box-shadow:6px 6px 0px #2D2D2D; padding:2rem; max-width:400px; width:90%; text-align:center;">
-        <div style="font-size:2rem; margin-bottom:0.5rem;">🗑️</div>
+<div id="deleteExpenseModal" class="modal-overlay">
+    <div class="modal-box">
         <div style="font-size:1.2rem; font-weight:900; color:#2D2D2D; margin-bottom:0.5rem;">Delete this expense?</div>
         <div style="font-size:0.9rem; color:#555; margin-bottom:1.5rem;">This cannot be undone.</div>
-        <div style="display:flex; gap:12px; justify-content:center;">
-            <button onclick="closeDeleteExpenseModal()"
-                    style="background:white; border:2px solid #2D2D2D; border-radius:999px; padding:10px 28px; font-weight:800; font-size:0.9rem; cursor:pointer; box-shadow:3px 3px 0px #2D2D2D;">
-                Cancel
-            </button>
-            <button id="confirmDeleteExpenseBtn" type="button"
-                    style="background:#2D2D2D; color:white; border:2px solid #2D2D2D; border-radius:999px; padding:10px 28px; font-weight:800; font-size:0.9rem; cursor:pointer; box-shadow:3px 3px 0px #2D2D2D;">
-                Yes, Delete
-            </button>
+        <div class="d-flex gap-3 justify-content-center">
+            <button onclick="closeDeleteExpenseModal()" class="btn-modal light">Cancel</button>
+            <button id="confirmDeleteExpenseBtn" type="button" class="btn-modal dark">Yes, Delete</button>
         </div>
     </div>
 </div>
-
-<script>
-    // ── Edit Expense ────────────────────────────────────────
-    function openEditExpenseModal(expenseId, description, amount, paidByParticipantId, splitIdsStr) {
-        const modal = document.getElementById('editExpenseModal');
-        modal.style.display = 'flex';
-
-        document.getElementById('editExpenseDescription').value = description;
-        document.getElementById('editExpenseAmount').value = amount;
-        document.getElementById('editExpensePaidBy').value = paidByParticipantId;
-
-        const splitIds = splitIdsStr ? splitIdsStr.split(',') : [];
-        document.querySelectorAll('.edit-split-checkbox').forEach(cb => {
-            cb.checked = splitIds.includes(cb.value);
-        });
-
-        const oldBtn = document.getElementById('confirmEditExpenseBtn');
-        const newBtn = oldBtn.cloneNode(true);
-        oldBtn.parentNode.replaceChild(newBtn, oldBtn);
-
-        newBtn.addEventListener('click', function () {
-            const formData = new FormData();
-            formData.append('expenseId', expenseId);
-            formData.append('description', document.getElementById('editExpenseDescription').value.trim());
-            formData.append('amount', document.getElementById('editExpenseAmount').value);
-            formData.append('paidByParticipantId', document.getElementById('editExpensePaidBy').value);
-
-            document.querySelectorAll('.edit-split-checkbox:checked').forEach(cb => {
-                formData.append('splitParticipantIds', cb.value);
-            });
-
-            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
-            formData.append('__RequestVerificationToken', token);
-
-            fetch('/Event/EditExpense', {
-                method: 'POST',
-                body: formData
-            }).then(res => {
-                if (res.ok) {
-                    closeEditExpenseModal();
-                    const eventId = document.getElementById('eventDetailWrapper').dataset.eventId;
-                    refreshDetailsPanel(eventId);
-                }
-            });
-        });
-
-        modal.onclick = function (e) {
-            if (e.target === modal) closeEditExpenseModal();
-        };
-    }
-
-    function closeEditExpenseModal() {
-        const modal = document.getElementById('editExpenseModal');
-        if (modal) modal.style.display = 'none';
-    }
-
-    // ── Add Member ──────────────────────────────────────────
-    function openAddMemberModal(eventId) {
-        const modal = document.getElementById('addMemberModal');
-        modal.style.display = 'flex';
-
-        const oldBtn = document.getElementById('confirmAddMemberBtn');
-        const newBtn = oldBtn.cloneNode(true);
-        oldBtn.parentNode.replaceChild(newBtn, oldBtn);
-
-        newBtn.addEventListener('click', function () {
-            const name = document.getElementById('newMemberName').value.trim();
-            if (!name) {
-                document.getElementById('newMemberName').focus();
-                return;
-            }
-            const contribution = document.getElementById('newMemberContribution').value.trim();
-            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
-
-            const formData = new FormData();
-            formData.append('eventId', eventId);
-            formData.append('name', name);
-            formData.append('contribution', contribution);
-            formData.append('__RequestVerificationToken', token);
-
-            fetch('/Event/AddMember', {
-                method: 'POST',
-                body: formData
-            }).then(res => {
-                if (res.ok) {
-                    closeAddMemberModal();
-                    refreshDetailsPanel(eventId);
-                }
-            });
-        });
-
-        modal.onclick = function (e) {
-            if (e.target === modal) closeAddMemberModal();
-        };
-    }
-
-    function closeAddMemberModal() {
-        const modal = document.getElementById('addMemberModal');
-        if (modal) modal.style.display = 'none';
-        document.getElementById('newMemberName').value = '';
-        document.getElementById('newMemberContribution').value = '';
-    }
-
-    // ── Delete Expense ──────────────────────────────────────
-    function openDeleteExpenseModal(expenseId, eventId) {
-        const modal = document.getElementById('deleteExpenseModal');
-        modal.style.display = 'flex';
-
-        const oldBtn = document.getElementById('confirmDeleteExpenseBtn');
-        const newBtn = oldBtn.cloneNode(true);
-        oldBtn.parentNode.replaceChild(newBtn, oldBtn);
-
-        newBtn.addEventListener('click', function () {
-            const formData = new FormData();
-            formData.append('expenseId', expenseId);
-            formData.append('eventId', eventId);
-
-            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
-            formData.append('__RequestVerificationToken', token);
-
-            fetch('/Event/DeleteExpense', {
-                method: 'POST',
-                body: formData
-            }).then(res => {
-                if (res.ok) {
-                    closeDeleteExpenseModal();
-                    refreshDetailsPanel(eventId);
-                }
-            });
-        });
-
-        modal.onclick = function (e) {
-            if (e.target === modal) closeDeleteExpenseModal();
-        };
-    }
-
-    function closeDeleteExpenseModal() {
-        const modal = document.getElementById('deleteExpenseModal');
-        if (modal) modal.style.display = 'none';
-    }
-</script>

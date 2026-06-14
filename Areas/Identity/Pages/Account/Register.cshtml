@@ -8,10 +8,8 @@
     <div class="row justify-content-center">
         <div class="col-lg-5">
 
-            <!-- Back to Home Button -->
             <div class="mb-3">
-                <a asp-controller="Home" asp-action="Index"
-                   style="display: inline-flex; align-items: center; gap: 6px; background: white; border: 2px solid #2D2D2D; border-radius: 999px; padding: 8px 20px; font-weight: 800; font-size: 0.9rem; box-shadow: 3px 3px 0px #2D2D2D; text-decoration: none; color: #2D2D2D;">
+                <a asp-controller="Home" asp-action="Index" class="btn-back">
                     ← Back to Home
                 </a>
             </div>
@@ -28,19 +26,19 @@
 
                     <div class="mb-3">
                         <label asp-for="Input.Email" class="form-label fw-bold">Email Address</label>
-                        <input asp-for="Input.Email" class="form-control hatian-input" placeholder="juan@email.com" />
+                        <input asp-for="Input.Email" class="form-control hatian-input" placeholder="juan@email.com" required />
                         <span asp-validation-for="Input.Email" class="text-danger"></span>
                     </div>
 
                     <div class="mb-3">
                         <label asp-for="Input.Password" class="form-label fw-bold">Password</label>
-                        <input asp-for="Input.Password" class="form-control hatian-input" placeholder="Enter password" />
+                        <input asp-for="Input.Password" class="form-control hatian-input" placeholder="Enter password" required />
                         <span asp-validation-for="Input.Password" class="text-danger"></span>
                     </div>
 
                     <div class="mb-4">
                         <label asp-for="Input.ConfirmPassword" class="form-label fw-bold">Confirm Password</label>
-                        <input asp-for="Input.ConfirmPassword" class="form-control hatian-input" placeholder="Confirm password" />
+                        <input asp-for="Input.ConfirmPassword" class="form-control hatian-input" placeholder="Confirm password" required />
                         <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
                     </div>
 
@@ -58,7 +56,6 @@
 
 @if (TempData["RegisterSuccess"] != null)
 {
-    <!-- Success Modal -->
     <div class="modal fade" id="successModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content rounded-4 border-0 shadow">

@@ -1,8 +1,4 @@
-﻿/* ===========================
-   SHARED COMPONENTS
-   (cards, inputs, buttons used across
-   Auth pages, Join pages, About, etc.)
-=========================== */
+/* SHARED COMPONENTS (cards and stuff) */
 .hatian-card {
     background: white;
     border: 3px solid #2D2D2D;
@@ -17,15 +13,12 @@
     background: #FFFDF9;
     padding: 12px 16px !important;
 }
-
-    .hatian-input:focus {
-        border-color: #F05142 !important;
-        box-shadow: 0 0 0 .2rem rgba(240,81,66,.25);
-    }
-
-.form-label {
-    font-weight: 700;
+.hatian-input:focus {
+    border-color: #F05142 !important;
+    box-shadow: 0 0 0 .2rem rgba(240,81,66,.25);
 }
+
+.form-label { font-weight: 700; }
 
 .btn-step {
     background: #111;
@@ -36,19 +29,10 @@
     width: 100%;
     font-weight: 700;
 }
+.btn-step:hover { background: #222; color: white; }
 
-    .btn-step:hover {
-        background: #222;
-        color: white;
-    }
-
-/* ===========================
-   CHIP CHECKBOXES / RADIOS
-=========================== */
-.chip-input {
-    display: none;
-}
-
+/* CHIP CHECKBOXES */
+.chip-input { display: none; }
 .chip-label {
     padding: 8px 16px;
     border-radius: 20px;
@@ -60,9 +44,210 @@
     background: white;
     transition: all 0.2s;
 }
-
 .chip-input:checked + .chip-label {
     background-color: var(--brand-coral);
     color: white;
     border-color: var(--brand-coral);
+}
+
+/* Dashboard stuff */
+
+/* stat boxes at top of dashboard */
+.stat-box {
+    flex: 1;
+    border: 2px solid #2D2D2D;
+    border-radius: 16px;
+    padding: 1.5rem 1.75rem;
+    box-shadow: 4px 4px 0px #2D2D2D;
+}
+.stat-box .stat-title {
+    font-size: 0.7rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #2D2D2D;
+}
+.stat-box .stat-value {
+    font-size: 2.75rem;
+    font-weight: 900;
+    color: #2D2D2D;
+}
+
+/* the new event button card */
+.new-event-card {
+    background: #FFE68C;
+    border: 2px solid #2D2D2D;
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    box-shadow: 4px 4px 0px #2D2D2D;
+    cursor: pointer;
+}
+.new-event-card .icon-circle {
+    width: 42px;
+    height: 42px;
+    background: #FFB5C6;
+    border: 2px solid #2D2D2D;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #2D2D2D;
+    font-size: 1.4rem;
+    font-weight: 900;
+    flex-shrink: 0;
+}
+
+/* event cards in lists */
+.event-card {
+    border: 2px solid #2D2D2D;
+    border-radius: 16px;
+    padding: 1.1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 4px 4px 0px #2D2D2D;
+}
+.event-card .event-title { font-weight: 800; font-size: 1rem; color: #2D2D2D; }
+.event-card .event-meta { font-size: 0.8rem; color: #555; margin-top: 3px; }
+
+/* used in details panel, event info cards, etc */
+.info-card {
+    background: white;
+    border: 2px solid #2D2D2D;
+    border-radius: 16px;
+    padding: 1.25rem;
+    box-shadow: 4px 4px 0px #2D2D2D;
+}
+
+/* header card at top of event detail panel */
+.event-header-card {
+    background: #FFB5C6;
+    border: 2px solid #2D2D2D;
+    border-radius: 16px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.25rem;
+}
+
+/* dark pill button for actions */
+.btn-dark-pill {
+    background: #2D2D2D;
+    color: white;
+    border: 2px solid #2D2D2D;
+    border-radius: 999px;
+    padding: 0.9rem;
+    font-weight: 800;
+    font-size: 0.95rem;
+    cursor: pointer;
+    width: 100%;
+}
+
+/* the split-among checkbox area */
+.split-list {
+    background: #F9F9F9;
+    border: 2px solid #2D2D2D;
+    border-radius: 12px;
+    padding: 0.75rem;
+}
+.split-list label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 4px;
+    cursor: pointer;
+}
+.split-list input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: #2D2D2D;
+    cursor: pointer;
+}
+
+/* small pill buttons for actions on cards */
+.btn-circle-sm {
+    border: 2px solid #2D2D2D;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* modal action buttons */
+.btn-modal {
+    border: 2px solid #2D2D2D;
+    border-radius: 999px;
+    padding: 10px 28px;
+    font-weight: 800;
+    font-size: 0.9rem;
+    cursor: pointer;
+    box-shadow: 3px 3px 0px #2D2D2D;
+}
+.btn-modal.dark { background: #2D2D2D; color: white; }
+.btn-modal.light { background: white; color: #2D2D2D; }
+
+/* friend remove button in create form */
+.btn-remove-friend {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: #FFB5C6;
+    border: 2px solid #2D2D2D;
+    color: #2D2D2D;
+    font-weight: 900;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 4px;
+}
+
+/* navbar styles */
+.hatian-nav {
+    background-color: white !important;
+    border-bottom: 2px solid #2D2D2D;
+}
+.nav-logout-btn {
+    background: white;
+    border: 2px solid #2D2D2D;
+    border-radius: 999px;
+    padding: 8px 24px;
+    font-weight: 800;
+    font-size: 0.9rem;
+    cursor: pointer;
+    box-shadow: 3px 3px 0px #2D2D2D;
+}
+
+/* progress bar */
+.progress-track {
+    background: #F0F0F0;
+    border-radius: 999px;
+    height: 10px;
+    overflow: hidden;
+}
+.progress-fill {
+    background: #B8EDD8;
+    height: 100%;
+}
+
+/* invite code display */
+.invite-code {
+    font-size: 2rem;
+    font-weight: 900;
+    color: #2D2D2D;
+    letter-spacing: 4px;
+}
+.btn-copy {
+    background: #FFE68C;
+    border: 2px solid #2D2D2D;
+    border-radius: 999px;
+    padding: 8px 18px;
+    font-weight: 800;
+    font-size: 0.8rem;
+    cursor: pointer;
 }

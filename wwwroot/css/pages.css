@@ -1,6 +1,4 @@
-﻿/* ===========================
-   HERO SECTION
-=========================== */
+/* HERO Part */
 .hero-section {
     background-image: url('/images/Background.png');
     background-size: cover;
@@ -30,9 +28,23 @@
     border: 2px solid #2D2D2D;
 }
 
-/* ===========================
-   LANDING PAGE CARDS
-=========================== */
+/* join event button on landing */
+.btn-join-outline {
+    background: white;
+    border: 2px solid #2D2D2D;
+    border-radius: 999px;
+    padding: 12px 0;
+    width: 100%;
+    display: block;
+    text-align: center;
+    font-weight: 800;
+    font-size: 0.95rem;
+    box-shadow: 3px 3px 0px #2D2D2D;
+    text-decoration: none;
+    color: #2D2D2D;
+}
+
+/* STEP CARDS */
 .step-card {
     border-radius: 16px;
     padding: 2rem 1.5rem;
@@ -40,18 +52,9 @@
     border: 2px solid #2D2D2D;
     position: relative;
 }
-
-.card-purple {
-    background-color: #E2D9FA;
-}
-
-.card-pink {
-    background-color: #FFB5C6;
-}
-
-.card-yellow {
-    background-color: #FFE68C;
-}
+.card-purple { background-color: #E2D9FA; }
+.card-pink { background-color: #FFB5C6; }
+.card-yellow { background-color: #FFE68C; }
 
 .badge-fun {
     position: absolute;
@@ -78,24 +81,162 @@
     margin-bottom: 1rem;
 }
 
-/* ===========================
-   STATS BANNER
-=========================== */
+/* STATS BANNER */
 .stats-banner {
     background-color: #FFF2E6;
     border-top: 2px solid #2D2D2D;
     padding: 2rem 0;
     margin-top: 4rem;
 }
-
 .stat-number {
     font-size: 2.5rem;
     font-weight: 900;
 }
-
 .stat-label {
     font-size: 0.75rem;
     font-weight: 700;
     color: #666;
     letter-spacing: 1px;
+}
+
+/* DASHBOARD LAYOUT */
+.dashboard-wrapper {
+    background-color: var(--bg-light);
+    min-height: 100vh;
+    padding: 3rem 2.5rem;
+}
+.dashboard-container {
+    max-width: 1100px;
+    margin: 0 auto;
+}
+
+/* left profile sidebar */
+.profile-sidebar {
+    width: 220px;
+    flex-shrink: 0;
+    text-align: center;
+}
+.profile-avatar-wrapper {
+    border: 2px solid #2D2D2D;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 4px 4px 0px #2D2D2D;
+    background: white;
+}
+.profile-name {
+    font-size: 1.3rem;
+    font-weight: 900;
+    color: #2D2D2D;
+    margin-bottom: 0.3rem;
+}
+.profile-email {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* right content area */
+.dashboard-content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+/* ===========================
+   GUEST DASHBOARD
+=========================== */
+.guest-layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 2rem;
+    align-items: start;
+}
+.guest-profile-card {
+    border: 2px solid #2D2D2D;
+    border-radius: 16px;
+    padding: 1.5rem 1.25rem;
+    box-shadow: 4px 4px 0px #2D2D2D;
+    text-align: center;
+    position: sticky;
+    top: 1.25rem;
+}
+.guest-avatar-box {
+    width: 110px;
+    height: 110px;
+    border: 2px solid #2D2D2D;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 3px 3px 0px #2D2D2D;
+    margin: 0 auto 1rem;
+}
+
+/* about modal in navbar */
+.about-modal-header {
+    background: #FFB5C6;
+    border-bottom: 2px solid #2D2D2D;
+    padding: 1.5rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.about-modal-body {
+    background: #FFFDF9;
+    padding: 2rem;
+}
+.about-tag {
+    background: white;
+    border: 2px solid #2D2D2D;
+    border-radius: 999px;
+    padding: 6px 16px;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+.team-avatar {
+    width: 80px;
+    height: 80px;
+    border: 2px solid #2D2D2D;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 3px 3px 0px #2D2D2D;
+    margin: 0 auto 0.5rem;
+}
+
+/* paid badge on event cards */
+.mark-paid-card {
+    background: white;
+    border: 2px solid #2D2D2D;
+    border-radius: 16px;
+    padding: 1rem 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 4px 4px 0px #2D2D2D;
+}
+.paid-status-badge {
+    background: #B8EDD8;
+    border: 2px solid #2D2D2D;
+    border-radius: 999px;
+    padding: 6px 16px;
+    font-weight: 800;
+    font-size: 0.8rem;
+}
+.btn-mark-paid {
+    background: #FFE68C;
+    border: 2px solid #2D2D2D;
+    border-radius: 999px;
+    padding: 6px 16px;
+    font-weight: 800;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+
+
+@media (max-width: 640px) {
+    .guest-layout {
+        grid-template-columns: 1fr !important;
+    }
 }

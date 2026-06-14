@@ -1,4 +1,4 @@
-﻿@model Hatian.Models.ViewModels.GuestEnterViewModel
+@model Hatian.Models.ViewModels.GuestEnterViewModel
 
 @{
     ViewData["Title"] = "Enter Name";
@@ -8,9 +8,7 @@
 
     <div class="hatian-card mx-auto" style="max-width:500px;">
 
-        <h2 class="fw-bold mb-4">
-            Enter Your Name
-        </h2>
+        <h2 class="fw-bold mb-4">Enter Your Name</h2>
 
         <form asp-action="EnterName" method="post">
 
@@ -18,11 +16,9 @@
 
             <input asp-for="GuestName"
                    class="form-control hatian-input mb-3"
-                   placeholder="Your Name" />
+                   placeholder="Your Name" required />
 
-            <button class="btn btn-dark rounded-pill w-100">
-                Enter Event
-            </button>
+            <button class="btn btn-dark rounded-pill w-100">Enter Event</button>
 
         </form>
 

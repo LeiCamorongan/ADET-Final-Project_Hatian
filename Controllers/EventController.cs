@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -27,7 +27,10 @@ namespace Hatian.Controllers
         public async Task<IActionResult> Create(CreateEventViewModel vm)
         {
             if (!ModelState.IsValid)
-                return View(vm);
+            {
+                TempData["ErrorMessage"] = "Please fill in all required fields to create an event.";
+                return RedirectToAction("Index", "Dashboard");
+            }
 
             var newEvent = new Event
             {
@@ -51,7 +54,7 @@ namespace Hatian.Controllers
             _db.Events.Add(newEvent);
             _db.Participants.Add(organizerParticipant);
 
-            foreach (var friend in vm.Friends
+            foreach (var friend in (vm.Friends ?? new List<FriendEntry>())
                 .Where(f => !string.IsNullOrWhiteSpace(f.Name)))
             {
                 _db.Participants.Add(new Participant
@@ -232,10 +235,21 @@ namespace Hatian.Controllers
         {
             var userId = _userManager.GetUserId(User);
             var ev = await _db.Events
+                .Include(e => e.Expenses)
+                    .ThenInclude(e => e.Splits)
                 .FirstOrDefaultAsync(e => e.Id == id && e.CreatedByUserId == userId);
 
             if (ev != null)
             {
+                
+                foreach (var expense in ev.Expenses)
+                {
+                    if (expense.Splits != null && expense.Splits.Any())
+                    {
+                        _db.ExpenseSplits.RemoveRange(expense.Splits);
+                    }
+                }
+
                 _db.Events.Remove(ev);
                 await _db.SaveChangesAsync();
             }

@@ -28,9 +28,9 @@
                     class="form-control hatian-input mb-3"
                     required>
                 <option value="" disabled selected>— Select your name —</option>
-                @foreach (var p in Model.Participants)
+                @foreach (var p in Model.Participants.Where(p => !p.IsOrganizer))
                 {
-                    <option value="@p.Name">@p.Name @(p.IsOrganizer ? "(organizer)" : "")</option>
+                    <option value="@p.Name">@p.Name</option>
                 }
             </select>
 

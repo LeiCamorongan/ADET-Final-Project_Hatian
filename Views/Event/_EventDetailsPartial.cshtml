@@ -28,6 +28,40 @@
                 debts[key] = (split.ParticipantId, debtorName, exp.PaidByParticipantId, creditorName, splitAmount);
         }
     }
+
+    // Net out opposing debts: if A owes B ₱333 and B owes A ₱216, show only A owes B ₱117
+    var nettedDebts = new Dictionary<string, (Guid DebtorId, string DebtorName, Guid CreditorId, string CreditorName, decimal Amount)>();
+    var processedPairs = new HashSet<string>();
+
+    foreach (var kv in debts)
+    {
+        if (processedPairs.Contains(kv.Key)) continue;
+
+        var debt = kv.Value;
+        var reverseKey = $"{debt.CreditorId}_{debt.DebtorId}";
+        decimal forward = debt.Amount;
+        decimal reverse = debts.ContainsKey(reverseKey) ? debts[reverseKey].Amount : 0m;
+        decimal net = forward - reverse;
+
+        processedPairs.Add(kv.Key);
+        processedPairs.Add(reverseKey);
+
+        if (net > 0.01m)
+            nettedDebts[kv.Key] = (debt.DebtorId, debt.DebtorName, debt.CreditorId, debt.CreditorName, Math.Round(net, 2));
+        else if (net < -0.01m)
+        {
+            var rev = debts.ContainsKey(reverseKey) ? debts[reverseKey] : debt;
+            nettedDebts[reverseKey] = (debt.CreditorId, debt.CreditorName, debt.DebtorId, debt.DebtorName, Math.Round(Math.Abs(net), 2));
+        }
+    }
+
+    debts = nettedDebts;
+
+    // Parse paid debt keys
+    var paidDebtKeys = new HashSet<string>(
+        string.IsNullOrWhiteSpace(ev.PaidDebtKeys)
+            ? Array.Empty<string>()
+            : ev.PaidDebtKeys.Split(',', StringSplitOptions.RemoveEmptyEntries));
 }
 
 
@@ -100,6 +134,14 @@
                                 @(string.IsNullOrWhiteSpace(p.Contribution) ? "—" : p.Contribution)
                             </div>
                         </div>
+                        <button class="btn-circle-sm edit-member-btn" style="background: var(--yellow); flex-shrink:0;"
+                                title="Edit member"
+                                data-participant-id="@p.Id"
+                                data-event-id="@ev.Id"
+                                data-name="@p.Name"
+                                data-contribution="@(p.Contribution ?? "")">
+                            ✏️
+                        </button>
                         @if (!p.IsOrganizer)
                         {
                             <button onclick="openRemoveMemberModal('@p.Id', '@ev.Id', '@p.Name')"
@@ -140,12 +182,25 @@
                         var debtorIdx = Model.Participants.FindIndex(p => p.Id == debt.DebtorId);
                         var debtorInitial = debt.DebtorName.Length > 0 ? debt.DebtorName.Substring(0, 1).ToUpper() : "?";
                         var debtorColor = debtorIdx >= 0 ? avatarColors[debtorIdx % avatarColors.Length] : "#EEE";
-                        <div class="d-flex align-items-center gap-2">
+                        var debtKey = $"{debt.DebtorId}_{debt.CreditorId}";
+                        var isDebtPaid = paidDebtKeys.Contains(debtKey);
+                        <div class="debt-row @(isDebtPaid ? "debt-paid" : "")"
+                             onclick="toggleDebtPaid('@ev.Id', '@debt.DebtorId', '@debt.CreditorId')"
+                             title="Click to mark as @(isDebtPaid ? "unpaid" : "paid")">
                             <div class="avatar-circle md" style="background:@debtorColor;">@debtorInitial</div>
                             <div style="flex:1; font-size:0.9rem; color:#2D2D2D;">
                                 <span style="font-weight:800;">@debt.DebtorName</span> owes <span style="font-weight:800;">@debt.CreditorName</span>
                             </div>
-                            <div style="font-weight:900; color:#2D2D2D; font-size:0.95rem;">₱@debt.Amount.ToString("0.00")</div>
+                            <div style="font-weight:900; font-size:0.95rem;">
+                                @if (isDebtPaid)
+                                {
+                                    <span style="color:#B8EDD8; font-weight:800;">Paid ✓</span>
+                                }
+                                else
+                                {
+                                    <span style="color:#2D2D2D;">₱@debt.Amount.ToString("0.00")</span>
+                                }
+                            </div>
                         </div>
                     }
                 </div>
@@ -392,4 +447,25 @@
             <button id="confirmRemoveMemberBtn" type="button" class="btn-modal dark">Yes, Remove</button>
         </div>
     </div>
+</div>
+
+<!-- Edit Member Modal -->
+<div id="editMemberModal" class="modal-overlay">
+    <form class="modal-box wide ajax-form" style="max-width:400px;" method="post" asp-controller="Event" asp-action="EditMember">
+        <input type="hidden" id="editMemberParticipantId" name="participantId" />
+        <input type="hidden" id="editMemberEventId" name="eventId" />
+        <div style="font-size:1.2rem; font-weight:900; color:#2D2D2D; margin-bottom:1.5rem; text-align:center;">Edit Member</div>
+        <div class="mb-3">
+            <label class="form-label fw-bold">Name</label>
+            <input id="editMemberName" name="name" class="form-control hatian-input" required />
+        </div>
+        <div class="mb-4">
+            <label class="form-label fw-bold">Contribution</label>
+            <input id="editMemberContribution" name="contribution" class="form-control hatian-input" placeholder="e.g. Snacks (optional)" />
+        </div>
+        <div class="d-flex gap-3 justify-content-center">
+            <button type="button" onclick="closeEditMemberModal()" class="btn-modal light">Cancel</button>
+            <button type="submit" class="btn-modal dark">Save Changes</button>
+        </div>
+    </form>
 </div>

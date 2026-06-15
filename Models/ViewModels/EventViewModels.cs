@@ -97,9 +97,29 @@ namespace Hatian.Models.ViewModels
 
         public string PayerName { get; set; } = string.Empty;
 
+        public Guid PayerParticipantId { get; set; }
+
         public decimal YourProportionalShare { get; set; }
 
         public bool WasPaidByMe { get; set; }
+
+        public bool IsDebtPaid { get; set; } = false;
+    }
+
+    public class GuestDebtItem
+    {
+        public string CreditorName { get; set; } = string.Empty;
+        public Guid CreditorParticipantId { get; set; }
+        public decimal Amount { get; set; }
+        public bool IsPaid { get; set; }
+    }
+
+    public class GuestOwedItem
+    {
+        public string DebtorName { get; set; } = string.Empty;
+        public Guid DebtorParticipantId { get; set; }
+        public decimal Amount { get; set; }
+        public bool IsPaid { get; set; }
     }
 
     public class GuestDashboardViewModel
@@ -110,6 +130,14 @@ namespace Hatian.Models.ViewModels
 
         public List<GuestShareItem> ShareItems { get; set; } = new();
 
+        public List<GuestDebtItem> NettedDebts { get; set; } = new();
+
+        public List<GuestOwedItem> OwedToMe { get; set; } = new();
+
         public decimal TotalOwed { get; set; }
+
+        public decimal TotalOwedToMe { get; set; }
+
+        public string PaidDebtKeys { get; set; } = string.Empty;
     }
 }

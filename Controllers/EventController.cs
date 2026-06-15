@@ -116,15 +116,28 @@ namespace Hatian.Controllers
 
                 _db.Expenses.Add(expense);
 
+                var splitCount = vm.SplitAmongParticipantIds.Count;
+                var amountPerPerson = splitCount > 0 ? vm.Amount / splitCount : 0;
+
                 foreach (var participantId in vm.SplitAmongParticipantIds)
                 {
                     _db.ExpenseSplits.Add(new ExpenseSplit
                     {
                         Id = Guid.NewGuid(),
                         ExpenseId = expense.Id,
-                        ParticipantId = participantId
+                        ParticipantId = participantId,
+                        AmountOwed = Math.Round(amountPerPerson, 2)
                     });
                 }
+
+                // Create ExpensePayer record for the person who paid
+                _db.ExpensePayers.Add(new ExpensePayer
+                {
+                    Id = Guid.NewGuid(),
+                    ExpenseId = expense.Id,
+                    ParticipantId = vm.PaidByParticipantId,
+                    AmountPaid = vm.Amount
+                });
 
                 await _db.SaveChangesAsync();
 
@@ -144,11 +157,13 @@ namespace Hatian.Controllers
         {
             var expense = await _db.Expenses
                 .Include(e => e.Splits)
+                .Include(e => e.Payers)
                 .FirstOrDefaultAsync(e => e.Id == expenseId);
 
             if (expense != null)
             {
                 _db.ExpenseSplits.RemoveRange(expense.Splits);
+                _db.ExpensePayers.RemoveRange(expense.Payers);
                 _db.Expenses.Remove(expense);
                 await _db.SaveChangesAsync();
             }
@@ -161,6 +176,7 @@ namespace Hatian.Controllers
         {
             var expense = await _db.Expenses
                 .Include(e => e.Splits)
+                .Include(e => e.Payers)
                 .FirstOrDefaultAsync(e => e.Id == expenseId);
 
             if (expense == null) return NotFound();
@@ -169,16 +185,32 @@ namespace Hatian.Controllers
             expense.Amount = amount;
             expense.PaidByParticipantId = paidByParticipantId;
 
+            // Remove old splits and payers
             _db.ExpenseSplits.RemoveRange(expense.Splits);
+            _db.ExpensePayers.RemoveRange(expense.Payers);
+
+            var splitCount = splitParticipantIds.Count;
+            var amountPerPerson = splitCount > 0 ? amount / splitCount : 0;
+
             foreach (var participantId in splitParticipantIds)
             {
                 _db.ExpenseSplits.Add(new ExpenseSplit
                 {
                     Id = Guid.NewGuid(),
                     ExpenseId = expenseId,
-                    ParticipantId = participantId
+                    ParticipantId = participantId,
+                    AmountOwed = Math.Round(amountPerPerson, 2)
                 });
             }
+
+            // Re-create ExpensePayer record
+            _db.ExpensePayers.Add(new ExpensePayer
+            {
+                Id = Guid.NewGuid(),
+                ExpenseId = expenseId,
+                ParticipantId = paidByParticipantId,
+                AmountPaid = amount
+            });
 
             await _db.SaveChangesAsync();
             return Ok();
@@ -213,19 +245,80 @@ namespace Hatian.Controllers
 
             if (participant != null)
             {
-                participant.IsPaid = true;
+                // Toggle: if already paid, mark unpaid; otherwise mark paid
+                participant.IsPaid = !participant.IsPaid;
                 await _db.SaveChangesAsync();
 
                 var ev = await _db.Events
                     .Include(e => e.Participants)
                     .FirstOrDefaultAsync(e => e.Id == eventId);
 
-                if (ev != null && ev.Participants.All(p => p.IsPaid))
+                if (ev != null)
                 {
-                    ev.Status = "Completed";
+                    if (ev.Participants.Where(p => !p.IsOrganizer).All(p => p.IsPaid))
+                    {
+                        ev.Status = "Completed";
+                    }
+                    else
+                    {
+                        ev.Status = "Active";
+                    }
                     await _db.SaveChangesAsync();
                 }
             }
+
+            return Ok();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RemoveMember(Guid participantId, Guid eventId)
+        {
+            var participant = await _db.Participants
+                .Include(p => p.ExpenseSplits)
+                .Include(p => p.ExpensePayers)
+                .Include(p => p.ExpensesPaid)
+                .FirstOrDefaultAsync(p => p.Id == participantId && p.EventId == eventId);
+
+            if (participant == null)
+                return NotFound();
+
+            // Don't allow removing the organizer
+            if (participant.IsOrganizer)
+                return BadRequest("Cannot remove the organizer.");
+
+            // Remove their expense splits
+            _db.ExpenseSplits.RemoveRange(participant.ExpenseSplits);
+
+            // Remove their expense payer records
+            _db.ExpensePayers.RemoveRange(participant.ExpensePayers);
+
+            // For expenses they paid for, reassign or delete
+            // Delete expenses that this participant paid for
+            foreach (var expense in participant.ExpensesPaid.ToList())
+            {
+                var expenseSplits = await _db.ExpenseSplits
+                    .Where(s => s.ExpenseId == expense.Id)
+                    .ToListAsync();
+                _db.ExpenseSplits.RemoveRange(expenseSplits);
+
+                var expensePayers = await _db.ExpensePayers
+                    .Where(ep => ep.ExpenseId == expense.Id)
+                    .ToListAsync();
+                _db.ExpensePayers.RemoveRange(expensePayers);
+
+                _db.Expenses.Remove(expense);
+            }
+
+            // Remove settlements involving this participant
+            var settlements = await _db.Settlements
+                .Where(s => s.EventId == eventId &&
+                    (s.DebtorParticipantId == participantId ||
+                     s.CreditorParticipantId == participantId))
+                .ToListAsync();
+            _db.Settlements.RemoveRange(settlements);
+
+            _db.Participants.Remove(participant);
+            await _db.SaveChangesAsync();
 
             return Ok();
         }
@@ -237,16 +330,28 @@ namespace Hatian.Controllers
             var ev = await _db.Events
                 .Include(e => e.Expenses)
                     .ThenInclude(e => e.Splits)
+                .Include(e => e.Expenses)
+                    .ThenInclude(e => e.Payers)
+                .Include(e => e.Settlements)
                 .FirstOrDefaultAsync(e => e.Id == id && e.CreatedByUserId == userId);
 
             if (ev != null)
             {
-                
+                // Remove settlements
+                if (ev.Settlements != null && ev.Settlements.Any())
+                {
+                    _db.Settlements.RemoveRange(ev.Settlements);
+                }
+
                 foreach (var expense in ev.Expenses)
                 {
                     if (expense.Splits != null && expense.Splits.Any())
                     {
                         _db.ExpenseSplits.RemoveRange(expense.Splits);
+                    }
+                    if (expense.Payers != null && expense.Payers.Any())
+                    {
+                        _db.ExpensePayers.RemoveRange(expense.Payers);
                     }
                 }
 

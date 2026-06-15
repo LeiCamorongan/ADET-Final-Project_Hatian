@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace Hatian.Models.Entities
 {
@@ -21,5 +21,6 @@ namespace Hatian.Models.Entities
 
         public ICollection<Participant> Participants { get; set; } = new List<Participant>();
         public ICollection<Expense> Expenses { get; set; } = new List<Expense>();
+        public ICollection<Settlement> Settlements { get; set; } = new List<Settlement>();
     }
 }

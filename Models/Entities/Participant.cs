@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Hatian.Models.Entities
 {
@@ -23,5 +23,13 @@ namespace Hatian.Models.Entities
             = new List<Expense>();
 
         public ICollection<ExpenseSplit> ExpenseSplits { get; set; } = new List<ExpenseSplit>();
+
+        public ICollection<ExpensePayer> ExpensePayers { get; set; } = new List<ExpensePayer>();
+
+        [InverseProperty("Debtor")]
+        public ICollection<Settlement> Debts { get; set; } = new List<Settlement>();
+
+        [InverseProperty("Creditor")]
+        public ICollection<Settlement> Credits { get; set; } = new List<Settlement>();
     }
 }

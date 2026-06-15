@@ -359,5 +359,40 @@
     function closeDeleteExpenseModal() {
         document.getElementById('deleteExpenseModal').style.display = 'none';
     }
+
+    // remove member
+    function openRemoveMemberModal(participantId, eventId, memberName) {
+        var modal = document.getElementById('removeMemberModal');
+        modal.style.display = 'flex';
+        document.getElementById('removeMemberMessage').textContent =
+            'Remove ' + memberName + '? This will also remove their expenses and splits.';
+
+        var oldBtn = document.getElementById('confirmRemoveMemberBtn');
+        var newBtn = oldBtn.cloneNode(true);
+        oldBtn.parentNode.replaceChild(newBtn, oldBtn);
+
+        newBtn.addEventListener('click', function() {
+            var formData = new FormData();
+            formData.append('participantId', participantId);
+            formData.append('eventId', eventId);
+
+            var token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            formData.append('__RequestVerificationToken', token);
+
+            fetch('/Event/RemoveMember', { method: 'POST', body: formData })
+                .then(function(res) {
+                    if (res.ok) {
+                        closeRemoveMemberModal();
+                        refreshDetailsPanel(eventId);
+                    }
+                });
+        });
+
+        modal.onclick = function(e) { if (e.target === modal) closeRemoveMemberModal(); };
+    }
+
+    function closeRemoveMemberModal() {
+        document.getElementById('removeMemberModal').style.display = 'none';
+    }
     </script>
 }

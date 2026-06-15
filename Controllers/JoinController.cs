@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Hatian.Data;
 using Hatian.Models.Entities;
@@ -48,14 +48,18 @@ namespace Hatian.Controllers
         [HttpGet]
         public async Task<IActionResult> EnterName(Guid eventId)
         {
-            var ev = await _db.Events.FindAsync(eventId);
+            var ev = await _db.Events
+                .Include(e => e.Participants)
+                .FirstOrDefaultAsync(e => e.Id == eventId);
 
             if (ev == null)
                 return NotFound();
 
             return View(new GuestEnterViewModel
             {
-                EventId = ev.Id
+                EventId = ev.Id,
+                EventTitle = ev.Title,
+                Participants = ev.Participants.ToList()
             });
         }
 
@@ -63,9 +67,21 @@ namespace Hatian.Controllers
         public async Task<IActionResult> EnterName(
             GuestEnterViewModel vm)
         {
+            // Re-load participants for the view in case of validation failure
+            var ev = await _db.Events
+                .Include(e => e.Participants)
+                .FirstOrDefaultAsync(e => e.Id == vm.EventId);
+
+            if (ev == null)
+                return NotFound();
+
+            vm.Participants = ev.Participants.ToList();
+            vm.EventTitle = ev.Title;
+
             if (!ModelState.IsValid)
                 return View(vm);
 
+            // Only allow existing participant names — no new creation
             var existingGuest =
                 await _db.Participants
                 .FirstOrDefaultAsync(p =>
@@ -73,26 +89,11 @@ namespace Hatian.Controllers
                     p.Name.ToLower() ==
                     vm.GuestName.Trim().ToLower());
 
-            Guid participantId;
-
-            if (existingGuest != null)
+            if (existingGuest == null)
             {
-                participantId = existingGuest.Id;
-            }
-            else
-            {
-                var newGuest = new Participant
-                {
-                    Id = Guid.NewGuid(),
-                    EventId = vm.EventId,
-                    Name = vm.GuestName.Trim()
-                };
-
-                _db.Participants.Add(newGuest);
-
-                await _db.SaveChangesAsync();
-
-                participantId = newGuest.Id;
+                ModelState.AddModelError("GuestName",
+                    "That name doesn't exist in this event. Please select your name from the list.");
+                return View(vm);
             }
 
             return RedirectToAction(
@@ -100,7 +101,7 @@ namespace Hatian.Controllers
                 new
                 {
                     eventId = vm.EventId,
-                    participantId
+                    participantId = existingGuest.Id
                 });
         }
 

@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Hatian.Models.Entities
 {
@@ -15,5 +15,6 @@ namespace Hatian.Models.Entities
         public Participant PaidBy { get; set; } = null!;
 
         public ICollection<ExpenseSplit> Splits { get; set; } = new List<ExpenseSplit>();
+        public ICollection<ExpensePayer> Payers { get; set; } = new List<ExpensePayer>();
     }
 }

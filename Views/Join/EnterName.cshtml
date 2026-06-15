@@ -8,15 +8,31 @@
 
     <div class="hatian-card mx-auto" style="max-width:500px;">
 
-        <h2 class="fw-bold mb-4">Enter Your Name</h2>
+        <h2 class="fw-bold mb-2">Select Your Name</h2>
+        <div style="font-size:0.85rem; color:#888; margin-bottom:1.5rem;">
+            Choose your name from the participant list for <strong>@Model.EventTitle</strong>
+        </div>
+
+        @if (!ViewContext.ModelState.IsValid)
+        {
+            <div style="background: #FFE0E0; border: 2px solid #FF6B6B; border-radius: 10px; padding: 0.75rem 1rem; margin-bottom: 1rem; font-size: 0.85rem; color: #CC3333; font-weight: 600;">
+                @Html.ValidationSummary(true)
+            </div>
+        }
 
         <form asp-action="EnterName" method="post">
 
             <input asp-for="EventId" type="hidden" />
 
-            <input asp-for="GuestName"
-                   class="form-control hatian-input mb-3"
-                   placeholder="Your Name" required />
+            <select asp-for="GuestName"
+                    class="form-control hatian-input mb-3"
+                    required>
+                <option value="" disabled selected>— Select your name —</option>
+                @foreach (var p in Model.Participants)
+                {
+                    <option value="@p.Name">@p.Name @(p.IsOrganizer ? "(organizer)" : "")</option>
+                }
+            </select>
 
             <button class="btn btn-dark rounded-pill w-100">Enter Event</button>
 

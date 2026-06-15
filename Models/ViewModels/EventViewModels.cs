@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using Hatian.Models.Entities;
 
 namespace Hatian.Models.ViewModels
@@ -45,7 +45,11 @@ namespace Hatian.Models.ViewModels
 
     public class DebtItem
     {
+        public Guid DebtorParticipantId { get; set; }
+
         public string DebtorName { get; set; } = string.Empty;
+
+        public Guid CreditorParticipantId { get; set; }
 
         public string CreditorName { get; set; } = string.Empty;
 
@@ -81,6 +85,10 @@ namespace Hatian.Models.ViewModels
 
         [Required]
         public string GuestName { get; set; } = string.Empty;
+
+        public string EventTitle { get; set; } = string.Empty;
+
+        public List<Hatian.Models.Entities.Participant> Participants { get; set; } = new();
     }
 
     public class GuestShareItem

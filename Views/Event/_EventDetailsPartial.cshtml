@@ -7,8 +7,9 @@
     var progress = totalGuests == 0 ? 0 : (int)((double)paidCount / totalGuests * 100);
     string[] avatarColors = { "#FFB5C6", "#FFE68C", "#B8EDD8", "#C9B8F5" };
 
-    
-    var debts = new Dictionary<string, (string OwesName, decimal Amount)>();
+    // Build debts with composite key: debtorId_creditorId
+    // This allows one person to owe multiple different people
+    var debts = new Dictionary<string, (Guid DebtorId, string DebtorName, Guid CreditorId, string CreditorName, decimal Amount)>();
     foreach (var exp in Model.Expenses)
     {
         if (exp.Splits == null || !exp.Splits.Any()) continue;
@@ -16,15 +17,19 @@
         foreach (var split in exp.Splits)
         {
             if (split.ParticipantId == exp.PaidByParticipantId) continue;
-            var key = split.ParticipantId.ToString();
+            var key = $"{split.ParticipantId}_{exp.PaidByParticipantId}";
+            var debtorName = split.Participant?.Name
+                ?? Model.Participants.FirstOrDefault(p => p.Id == split.ParticipantId)?.Name
+                ?? "?";
             var creditorName = exp.PaidBy?.Name ?? "?";
             if (debts.ContainsKey(key))
-                debts[key] = (creditorName, debts[key].Amount + splitAmount);
+                debts[key] = (split.ParticipantId, debtorName, exp.PaidByParticipantId, creditorName, debts[key].Amount + splitAmount);
             else
-                debts[key] = (creditorName, splitAmount);
+                debts[key] = (split.ParticipantId, debtorName, exp.PaidByParticipantId, creditorName, splitAmount);
         }
     }
 }
+
 
 @Html.AntiForgeryToken()
 
@@ -87,7 +92,7 @@
                     var color = avatarColors[i % avatarColors.Length];
                     <div class="d-flex align-items-center gap-2">
                         <div class="avatar-circle lg" style="background:@color;">@initial</div>
-                        <div>
+                        <div style="flex:1;">
                             <div style="font-weight:800; color:#2D2D2D; font-size:0.95rem;">
                                 @p.Name @(p.IsOrganizer ? "(you)" : "")
                             </div>
@@ -95,6 +100,14 @@
                                 @(string.IsNullOrWhiteSpace(p.Contribution) ? "—" : p.Contribution)
                             </div>
                         </div>
+                        @if (!p.IsOrganizer)
+                        {
+                            <button onclick="openRemoveMemberModal('@p.Id', '@ev.Id', '@p.Name')"
+                                    class="btn-circle-sm" style="background: var(--pink); flex-shrink:0;"
+                                    title="Remove member">
+                                ✕
+                            </button>
+                        }
                     </div>
                 }
             </div>
@@ -123,16 +136,16 @@
                 <div class="d-flex flex-column gap-2">
                     @foreach (var kv in debts)
                     {
-                        var debtorParticipant = Model.Participants.FirstOrDefault(p => p.Id.ToString() == kv.Key);
-                        var debtorInitial = debtorParticipant?.Name.Substring(0, 1).ToUpper() ?? "?";
-                        var debtorIdx = Model.Participants.IndexOf(debtorParticipant!);
+                        var debt = kv.Value;
+                        var debtorIdx = Model.Participants.FindIndex(p => p.Id == debt.DebtorId);
+                        var debtorInitial = debt.DebtorName.Length > 0 ? debt.DebtorName.Substring(0, 1).ToUpper() : "?";
                         var debtorColor = debtorIdx >= 0 ? avatarColors[debtorIdx % avatarColors.Length] : "#EEE";
                         <div class="d-flex align-items-center gap-2">
                             <div class="avatar-circle md" style="background:@debtorColor;">@debtorInitial</div>
                             <div style="flex:1; font-size:0.9rem; color:#2D2D2D;">
-                                <span style="font-weight:800;">@debtorParticipant?.Name</span> owes <span style="font-weight:800;">@kv.Value.OwesName</span>
+                                <span style="font-weight:800;">@debt.DebtorName</span> owes <span style="font-weight:800;">@debt.CreditorName</span>
                             </div>
-                            <div style="font-weight:900; color:#2D2D2D; font-size:0.95rem;">₱@kv.Value.Amount.ToString("0.00")</div>
+                            <div style="font-weight:900; color:#2D2D2D; font-size:0.95rem;">₱@debt.Amount.ToString("0.00")</div>
                         </div>
                     }
                 </div>
@@ -143,7 +156,7 @@
         <div class="d-flex flex-column gap-2">
             @foreach (var p in Model.Participants.Where(p => !p.IsOrganizer))
             {
-                var debtAmount = debts.ContainsKey(p.Id.ToString()) ? debts[p.Id.ToString()].Amount : 0;
+                var debtAmount = debts.Where(d => d.Value.DebtorId == p.Id).Sum(d => d.Value.Amount);
                 <div class="mark-paid-card">
                     <div>
                         <div style="font-weight:800; color:#2D2D2D; font-size:0.95rem;">@p.Name</div>
@@ -164,7 +177,11 @@
                     </div>
                     @if (p.IsPaid)
                     {
-                        <span class="paid-status-badge">Paid</span>
+                        <form class="ajax-form" method="post" asp-controller="Event" asp-action="MarkAsPaid">
+                            <input type="hidden" name="participantId" value="@p.Id" />
+                            <input type="hidden" name="eventId" value="@ev.Id" />
+                            <button type="submit" class="paid-status-badge" style="cursor:pointer; border:none;">Paid</button>
+                        </form>
                     }
                     else
                     {
@@ -361,6 +378,18 @@
         <div class="d-flex gap-3 justify-content-center">
             <button onclick="closeDeleteExpenseModal()" class="btn-modal light">Cancel</button>
             <button id="confirmDeleteExpenseBtn" type="button" class="btn-modal dark">Yes, Delete</button>
+        </div>
+    </div>
+</div>
+
+<!-- Remove Member Modal -->
+<div id="removeMemberModal" class="modal-overlay">
+    <div class="modal-box">
+        <div style="font-size:1.2rem; font-weight:900; color:#2D2D2D; margin-bottom:0.5rem;">Remove this member?</div>
+        <div id="removeMemberMessage" style="font-size:0.9rem; color:#555; margin-bottom:1.5rem;">This will also remove their expenses and splits.</div>
+        <div class="d-flex gap-3 justify-content-center">
+            <button onclick="closeRemoveMemberModal()" class="btn-modal light">Cancel</button>
+            <button id="confirmRemoveMemberBtn" type="button" class="btn-modal dark">Yes, Remove</button>
         </div>
     </div>
 </div>

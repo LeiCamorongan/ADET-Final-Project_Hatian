@@ -1,6 +1,8 @@
+using System.ComponentModel.DataAnnotations.Schema;
+
 namespace Hatian.Models.Entities
 {
-    public class ExpenseSplit
+    public class ExpensePayer
     {
         public Guid Id { get; set; }
 
@@ -8,12 +10,11 @@ namespace Hatian.Models.Entities
 
         public Guid ParticipantId { get; set; }
 
-        public decimal AmountOwed { get; set; }
-
-        public string Status { get; set; } = "Unpaid"; // Unpaid, Paid
+        public decimal AmountPaid { get; set; }
 
         public Expense Expense { get; set; } = null!;
 
+        [ForeignKey(nameof(ParticipantId))]
         public Participant Participant { get; set; } = null!;
     }
 }

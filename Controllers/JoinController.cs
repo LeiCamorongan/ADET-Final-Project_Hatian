@@ -129,9 +129,58 @@ namespace Hatian.Controllers
                 Event = ev,
                 CurrentGuest = currentGuest,
                 TotalOwed = 0m,
-                ShareItems = new List<GuestShareItem>()
+                ShareItems = new List<GuestShareItem>(),
+                PaidDebtKeys = ev.PaidDebtKeys ?? string.Empty
             };
 
+            // Parse paid debt keys
+            var paidKeys = new HashSet<string>(
+                string.IsNullOrWhiteSpace(ev.PaidDebtKeys)
+                    ? Array.Empty<string>()
+                    : ev.PaidDebtKeys.Split(',', StringSplitOptions.RemoveEmptyEntries));
+
+            // Use DebtCalculator to get netted debts for accurate total
+            var nettedDebts = Services.DebtCalculator.ComputeDebts(ev);
+
+            // Calculate net total owed: sum of debts where I'm the debtor, minus debts where I'm the creditor
+            foreach (var debt in nettedDebts)
+            {
+                var debtKey = $"{debt.DebtorParticipantId}_{debt.CreditorParticipantId}";
+                var isDebtPaid = paidKeys.Contains(debtKey);
+
+                if (debt.DebtorParticipantId == currentGuest.Id)
+                {
+                    vm.NettedDebts.Add(new GuestDebtItem
+                    {
+                        CreditorName = debt.CreditorName,
+                        CreditorParticipantId = debt.CreditorParticipantId,
+                        Amount = debt.Amount,
+                        IsPaid = isDebtPaid
+                    });
+
+                    if (!isDebtPaid)
+                    {
+                        vm.TotalOwed += debt.Amount;
+                    }
+                }
+                else if (debt.CreditorParticipantId == currentGuest.Id)
+                {
+                    vm.OwedToMe.Add(new GuestOwedItem
+                    {
+                        DebtorName = debt.DebtorName,
+                        DebtorParticipantId = debt.DebtorParticipantId,
+                        Amount = debt.Amount,
+                        IsPaid = isDebtPaid
+                    });
+
+                    if (!isDebtPaid)
+                    {
+                        vm.TotalOwedToMe += debt.Amount;
+                    }
+                }
+            }
+
+            // Build per-expense share items for breakdown display
             foreach (var exp in ev.Expenses)
             {
                 if (exp.Splits.Any(
@@ -144,6 +193,10 @@ namespace Hatian.Controllers
                         exp.PaidByParticipantId ==
                         currentGuest.Id;
 
+                    // Check if this specific debt (me → payer) has been marked as paid
+                    var debtKey = $"{currentGuest.Id}_{exp.PaidByParticipantId}";
+                    var isDebtPaid = !iPaid && paidKeys.Contains(debtKey);
+
                     vm.ShareItems.Add(
                         new GuestShareItem
                         {
@@ -151,13 +204,13 @@ namespace Hatian.Controllers
                                 exp.Description,
                             PayerName =
                                 exp.PaidBy.Name,
+                            PayerParticipantId =
+                                exp.PaidByParticipantId,
                             YourProportionalShare =
                                 Math.Round(share, 2),
-                            WasPaidByMe = iPaid
+                            WasPaidByMe = iPaid,
+                            IsDebtPaid = isDebtPaid
                         });
-
-                    if (!iPaid)
-                        vm.TotalOwed += share;
                 }
             }
             ViewData["IsGuest"] = true;

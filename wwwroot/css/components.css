@@ -251,3 +251,31 @@
     font-size: 0.8rem;
     cursor: pointer;
 }
+
+/* clickable debt rows */
+.debt-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 2px solid transparent;
+}
+.debt-row:hover {
+    background: #F5F5F5;
+    border-color: #E0E0E0;
+}
+.debt-row.debt-paid {
+    opacity: 0.55;
+    text-decoration: line-through;
+    text-decoration-color: #B8EDD8;
+    text-decoration-thickness: 2px;
+    background: #F0FFF6;
+    border-color: #B8EDD8;
+}
+.debt-row.debt-paid:hover {
+    opacity: 0.75;
+    background: #E5F9EE;
+}

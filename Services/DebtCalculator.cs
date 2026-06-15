@@ -38,13 +38,35 @@ namespace Hatian.Services
                 }
             }
 
-            var debts = new List<DebtItem>();
+            // Net out opposing debts: if A owes B and B owes A, keep only the net
+            var nettedMap = new Dictionary<(Guid DebtorId, Guid CreditorId), decimal>();
+            var processed = new HashSet<(Guid, Guid)>();
 
             foreach (var kv in debtMap)
             {
-                if (kv.Value < 0.01m)
+                var pair = kv.Key;
+                if (processed.Contains(pair))
                     continue;
 
+                var reverseKey = (DebtorId: pair.CreditorId, CreditorId: pair.DebtorId);
+                decimal forward = kv.Value;
+                decimal reverse = debtMap.ContainsKey(reverseKey) ? debtMap[reverseKey] : 0m;
+                decimal net = forward - reverse;
+
+                processed.Add(pair);
+                processed.Add(reverseKey);
+
+                if (net > 0.01m)
+                    nettedMap[pair] = net;
+                else if (net < -0.01m)
+                    nettedMap[reverseKey] = Math.Abs(net);
+                // If net ≈ 0, they cancel out — no entry needed
+            }
+
+            var debts = new List<DebtItem>();
+
+            foreach (var kv in nettedMap)
+            {
                 debts.Add(new DebtItem
                 {
                     DebtorParticipantId = kv.Key.DebtorId,

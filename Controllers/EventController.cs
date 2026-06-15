@@ -237,6 +237,42 @@ namespace Hatian.Controllers
         }
 
         [HttpPost]
+        public async Task<IActionResult> EditMember(Guid participantId, Guid eventId, string name, string contribution)
+        {
+            var participant = await _db.Participants
+                .FirstOrDefaultAsync(p => p.Id == participantId && p.EventId == eventId);
+
+            if (participant == null) return NotFound();
+
+            participant.Name = name?.Trim() ?? participant.Name;
+            participant.Contribution = contribution?.Trim();
+
+            await _db.SaveChangesAsync();
+            return Ok();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ToggleDebtPaid(Guid eventId, Guid debtorParticipantId, Guid creditorParticipantId)
+        {
+            var ev = await _db.Events.FindAsync(eventId);
+            if (ev == null) return NotFound();
+
+            var key = $"{debtorParticipantId}_{creditorParticipantId}";
+            var keys = string.IsNullOrWhiteSpace(ev.PaidDebtKeys)
+                ? new List<string>()
+                : ev.PaidDebtKeys.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList();
+
+            if (keys.Contains(key))
+                keys.Remove(key);
+            else
+                keys.Add(key);
+
+            ev.PaidDebtKeys = string.Join(",", keys);
+            await _db.SaveChangesAsync();
+            return Ok();
+        }
+
+        [HttpPost]
         public async Task<IActionResult> MarkAsPaid(
             Guid participantId,
             Guid eventId)

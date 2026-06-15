@@ -236,7 +236,7 @@
                 });
             }
 
-            // ajax forms (add expense, mark paid)
+            // ajax forms (add expense, mark paid, edit member)
             content.querySelectorAll('.ajax-form').forEach(function(form) {
                 form.addEventListener('submit', function(e) {
                     e.preventDefault();
@@ -246,6 +246,18 @@
                     }).then(function(res) {
                         if (res.ok) refreshDetailsPanel(eventId);
                     });
+                });
+            });
+
+            // edit member buttons
+            content.querySelectorAll('.edit-member-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    openEditMemberModal(
+                        btn.dataset.participantId,
+                        btn.dataset.eventId,
+                        btn.dataset.name,
+                        btn.dataset.contribution
+                    );
                 });
             });
         }
@@ -393,6 +405,38 @@
 
     function closeRemoveMemberModal() {
         document.getElementById('removeMemberModal').style.display = 'none';
+    }
+
+    // edit member
+    function openEditMemberModal(participantId, eventId, name, contribution) {
+        var modal = document.getElementById('editMemberModal');
+        modal.style.display = 'flex';
+        document.getElementById('editMemberParticipantId').value = participantId;
+        document.getElementById('editMemberEventId').value = eventId;
+        document.getElementById('editMemberName').value = name;
+        document.getElementById('editMemberContribution').value = contribution || '';
+
+        modal.onclick = function(e) { if (e.target === modal) closeEditMemberModal(); };
+    }
+
+    function closeEditMemberModal() {
+        document.getElementById('editMemberModal').style.display = 'none';
+    }
+
+    // toggle debt paid
+    function toggleDebtPaid(eventId, debtorId, creditorId) {
+        var formData = new FormData();
+        formData.append('eventId', eventId);
+        formData.append('debtorParticipantId', debtorId);
+        formData.append('creditorParticipantId', creditorId);
+
+        var token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+        formData.append('__RequestVerificationToken', token);
+
+        fetch('/Event/ToggleDebtPaid', { method: 'POST', body: formData })
+            .then(function(res) {
+                if (res.ok) refreshDetailsPanel(eventId);
+            });
     }
     </script>
 }

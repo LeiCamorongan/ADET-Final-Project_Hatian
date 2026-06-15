@@ -19,6 +19,8 @@ namespace Hatian.Models.Entities
 
         public string InviteToken { get; set; } = Guid.NewGuid().ToString("N").Substring(0, 6).ToUpper();
 
+        public string PaidDebtKeys { get; set; } = string.Empty;
+
         public ICollection<Participant> Participants { get; set; } = new List<Participant>();
         public ICollection<Expense> Expenses { get; set; } = new List<Expense>();
         public ICollection<Settlement> Settlements { get; set; } = new List<Settlement>();

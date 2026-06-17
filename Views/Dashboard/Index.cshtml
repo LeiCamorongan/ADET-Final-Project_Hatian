@@ -86,8 +86,49 @@
                         {
                             @foreach (var ev in Model.ActiveEvents)
                             {
-                                var paidCount = ev.Participants.Count(p => p.IsPaid && !p.IsOrganizer);
-                                var totalGuests = ev.Participants.Count(p => !p.IsOrganizer);
+                                var debts = new Dictionary<string, decimal>();
+                                foreach (var exp in ev.Expenses)
+                                {
+                                    if (exp.Splits == null || !exp.Splits.Any()) continue;
+                                    var splitAmount = exp.Amount / exp.Splits.Count;
+                                    foreach (var split in exp.Splits)
+                                    {
+                                        if (split.ParticipantId == exp.PaidByParticipantId) continue;
+                                        var key = $"{split.ParticipantId}_{exp.PaidByParticipantId}";
+
+                                        if (debts.ContainsKey(key)) debts[key] += splitAmount;
+                                        else debts[key] = splitAmount;
+                                    }
+                                }
+
+                                var totalDebtsCount = 0;
+                                var processedPairs = new HashSet<string>();
+                                foreach (var kv in debts)
+                                {
+                                    if (processedPairs.Contains(kv.Key)) continue;
+                                    var splitKeys = kv.Key.Split('_');
+                                    var reverseKey = $"{splitKeys[1]}_{splitKeys[0]}";
+
+                                    decimal forward = kv.Value;
+                                    decimal reverse = debts.ContainsKey(reverseKey) ? debts[reverseKey] : 0m;
+                                    decimal net = forward - reverse;
+
+                                    processedPairs.Add(kv.Key);
+                                    processedPairs.Add(reverseKey);
+
+                                    if (Math.Abs(net) > 0.01m)
+                                    {
+                                        totalDebtsCount++;
+                                    }
+                                }
+
+                                var paidDebtKeys = string.IsNullOrWhiteSpace(ev.PaidDebtKeys)
+                                ? new HashSet<string>()
+                                : new HashSet<string>(ev.PaidDebtKeys.Split(',', StringSplitOptions.RemoveEmptyEntries));
+
+                                // 2. FIXED DIVIDEND: Only count a debt as paid if it actually exists in the active 'debts' list!
+                                // This stops the dividend from tracking raw member metrics or old phantom data rows.
+                                var paidDebtsCount = debts.Keys.Count(key => paidDebtKeys.Contains(key));
 
                                 <div data-event-card="@ev.Id" class="event-card" style="background: var(--pink);">
                                     <a href="#" onclick="openDetailsPanel('@ev.Id'); return false;" class="text-decoration-none" style="flex: 1;">
@@ -98,7 +139,7 @@
                                     </a>
                                     <div class="d-flex align-items-center gap-2" style="flex-shrink: 0;">
                                         <span class="pill-badge paid-badge" style="background: var(--yellow); color: #2D2D2D;">
-                                            ⏱ @paidCount/@totalGuests paid
+                                            ⏱ @paidDebtsCount/@totalDebtsCount paid
                                         </span>
                                         <button onclick="openDeleteModal('@ev.Id')" class="pill-badge" style="background: #2D2D2D; color: white; cursor: pointer;">
                                             🗑 Delete

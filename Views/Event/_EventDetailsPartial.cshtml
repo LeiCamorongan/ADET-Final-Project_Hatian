@@ -62,6 +62,18 @@
         string.IsNullOrWhiteSpace(ev.PaidDebtKeys)
             ? Array.Empty<string>()
             : ev.PaidDebtKeys.Split(',', StringSplitOptions.RemoveEmptyEntries));
+
+    var totalDebtsCount = debts.Count;
+    var paidDebtsCount = debts.Count(kv => paidDebtKeys.Contains(kv.Key));
+    progress = totalDebtsCount == 0 ? 0 : (int)((double)paidDebtsCount / totalDebtsCount * 100);
+
+    // 👇 ADDED: Overriding the UI status text if all debts are settled
+    // If there are valid debt relationships AND every single one of them is marked paid:
+    string eventStatusDisplay = ev.Status;
+    if (totalDebtsCount > 0 && paidDebtsCount == totalDebtsCount)
+    {
+        eventStatusDisplay = "Complete";
+    }
 }
 
 
@@ -74,7 +86,8 @@
         <div class="section-label">Event</div>
         <div class="d-flex justify-content-between align-items-start">
             <div style="font-size: 1.6rem; font-weight: 900; color: #2D2D2D;">@ev.Title</div>
-            <span class="pill-badge" style="background: white; color: #2D2D2D;">@ev.Status</span>
+
+            <span class="pill-badge" style="background: white; color: #2D2D2D;">@eventStatusDisplay</span>
         </div>
         <div style="font-size: 0.85rem; color: #444; margin-top: 0.5rem;">
             📅 @ev.Date.ToString("MMMM dd, yyyy") · 👥 @Model.Participants.Count people
@@ -84,8 +97,8 @@
     <!-- Tabs -->
     <div class="d-flex gap-2" style="margin-bottom: 1.25rem;">
         <button class="detail-tab-btn tab-btn active" data-tab="info">Info</button>
-        <button class="detail-tab-btn tab-btn" data-tab="contributions">Contributions</button>
         <button class="detail-tab-btn tab-btn" data-tab="expenses">Expenses</button>
+        <button class="detail-tab-btn tab-btn" data-tab="contributions">Contributions</button>
     </div>
 
     <!-- INFO TAB -->
@@ -164,7 +177,8 @@
         <div class="info-card" style="margin-bottom: 1rem;">
             <div class="d-flex justify-content-between align-items-center" style="margin-bottom: 0.75rem;">
                 <div style="font-weight:800; font-size:1rem; color:#2D2D2D;">Payment Progress</div>
-                <div style="font-size:0.85rem; color:#888; font-weight:700;">@paidCount/@totalGuests paid</div>
+
+                <div style="font-size:0.85rem; color:#888; font-weight:700;">@paidDebtsCount/@totalDebtsCount paid</div>
             </div>
             <div class="progress-track">
                 <div class="progress-fill" style="width:@(progress)%;"></div>
@@ -207,48 +221,7 @@
             </div>
         }
 
-        <div class="section-label" style="margin-bottom: 0.5rem;">Mark As Paid</div>
-        <div class="d-flex flex-column gap-2">
-            @foreach (var p in Model.Participants.Where(p => !p.IsOrganizer))
-            {
-                var debtAmount = debts.Where(d => d.Value.DebtorId == p.Id).Sum(d => d.Value.Amount);
-                <div class="mark-paid-card">
-                    <div>
-                        <div style="font-weight:800; color:#2D2D2D; font-size:0.95rem;">@p.Name</div>
-                        <div style="font-size:0.8rem; color:#888;">
-                            @if (p.IsPaid)
-                            {
-                                <span>Paid</span>
-                            }
-                            else if (debtAmount > 0)
-                            {
-                                <span>Owes ₱@debtAmount.ToString("0.00")</span>
-                            }
-                            else
-                            {
-                                <span>Not paid yet</span>
-                            }
-                        </div>
-                    </div>
-                    @if (p.IsPaid)
-                    {
-                        <form class="ajax-form" method="post" asp-controller="Event" asp-action="MarkAsPaid">
-                            <input type="hidden" name="participantId" value="@p.Id" />
-                            <input type="hidden" name="eventId" value="@ev.Id" />
-                            <button type="submit" class="paid-status-badge" style="cursor:pointer; border:none;">Paid</button>
-                        </form>
-                    }
-                    else
-                    {
-                        <form class="ajax-form" method="post" asp-controller="Event" asp-action="MarkAsPaid">
-                            <input type="hidden" name="participantId" value="@p.Id" />
-                            <input type="hidden" name="eventId" value="@ev.Id" />
-                            <button type="submit" class="btn-mark-paid">Mark Paid</button>
-                        </form>
-                    }
-                </div>
-            }
-        </div>
+    
 
     </div>
 

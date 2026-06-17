@@ -24,6 +24,7 @@ namespace Hatian.Controllers
             var events = await _db.Events
                 .Include(e => e.Participants)
                 .Include(e => e.Expenses)
+                    .ThenInclude(ex => ex.Splits)
                 .Where(e => e.CreatedByUserId == userId)
                 .OrderByDescending(e => e.Date)
                 .ToListAsync();

@@ -318,16 +318,17 @@
                     var tabBtn = document.querySelector('#detailsPanelContent .detail-tab-btn[data-tab="' + activeTab + '"]');
                     if (tabBtn) tabBtn.click();
 
-                    // also update the paid badge on the dashboard card
-                    var panel = document.getElementById('detailsPanelContent');
-                    var match = panel.textContent.match(/(\d+)\/(\d+) paid/);
-                    if (match) {
-                        var card = document.querySelector('[data-event-card="' + eventId + '"]');
-                        if (card) {
-                            var badge = card.querySelector('.paid-badge');
-                            if (badge) badge.textContent = match[1] + '/' + match[2] + ' paid';
-                        }
-                    }
+                    // Update the background dashboard silently to reflect any status/progress changes
+                    fetch(window.location.href)
+                        .then(r => r.text())
+                        .then(dashHtml => {
+                            var parser = new DOMParser();
+                            var doc = parser.parseFromString(dashHtml, 'text/html');
+                            var newContent = doc.querySelector('.dashboard-content');
+                            if (newContent) {
+                                document.querySelector('.dashboard-content').innerHTML = newContent.innerHTML;
+                            }
+                        });
                 });
         }
 

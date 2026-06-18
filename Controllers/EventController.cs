@@ -147,6 +147,8 @@ namespace Hatian.Controllers
                     ev.Status = "Active";
                     await _db.SaveChangesAsync();
                 }
+                
+                await UpdateEventStatusAsync(vm.EventId);
             }
 
             return Ok();
@@ -166,6 +168,8 @@ namespace Hatian.Controllers
                 _db.ExpensePayers.RemoveRange(expense.Payers);
                 _db.Expenses.Remove(expense);
                 await _db.SaveChangesAsync();
+                
+                await UpdateEventStatusAsync(eventId);
             }
 
             return Ok();
@@ -213,6 +217,13 @@ namespace Hatian.Controllers
             });
 
             await _db.SaveChangesAsync();
+            
+            var expenseEventId = await _db.Expenses.Where(e => e.Id == expenseId).Select(e => e.EventId).FirstOrDefaultAsync();
+            if (expenseEventId != Guid.Empty)
+            {
+                await UpdateEventStatusAsync(expenseEventId);
+            }
+
             return Ok();
         }
 
@@ -269,6 +280,9 @@ namespace Hatian.Controllers
 
             ev.PaidDebtKeys = string.Join(",", keys);
             await _db.SaveChangesAsync();
+            
+            await UpdateEventStatusAsync(eventId);
+
             return Ok();
         }
 
@@ -356,6 +370,8 @@ namespace Hatian.Controllers
             _db.Participants.Remove(participant);
             await _db.SaveChangesAsync();
 
+            await UpdateEventStatusAsync(eventId);
+
             return Ok();
         }
 
@@ -396,6 +412,36 @@ namespace Hatian.Controllers
             }
 
             return RedirectToAction("Index", "Dashboard");
+        }
+
+        private async Task UpdateEventStatusAsync(Guid eventId)
+        {
+            var ev = await _db.Events
+                .Include(e => e.Participants)
+                .Include(e => e.Expenses)
+                    .ThenInclude(ex => ex.Splits)
+                .FirstOrDefaultAsync(e => e.Id == eventId);
+
+            if (ev == null) return;
+
+            var keys = string.IsNullOrWhiteSpace(ev.PaidDebtKeys)
+                ? new List<string>()
+                : ev.PaidDebtKeys.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList();
+
+            var computedDebts = DebtCalculator.ComputeDebts(ev);
+            var totalDebtsCount = computedDebts.Count;
+            var paidDebtsCount = computedDebts.Count(d => keys.Contains($"{d.DebtorParticipantId}_{d.CreditorParticipantId}"));
+
+            if (totalDebtsCount > 0 && paidDebtsCount == totalDebtsCount)
+            {
+                ev.Status = "Completed";
+            }
+            else
+            {
+                ev.Status = "Active";
+            }
+
+            await _db.SaveChangesAsync();
         }
     }
 }
